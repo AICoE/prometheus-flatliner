@@ -1,10 +1,6 @@
 from .baseflatliner import BaseFlatliner
 
 
-def metric_values(x):
-    return x['values']
-
-
 class VersionedMetrics(BaseFlatliner):
     def __init__(self):
         super().__init__()

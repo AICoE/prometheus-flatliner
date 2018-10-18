@@ -9,6 +9,7 @@ class StdDevVersion(BaseFlatliner):
         """ update std dev for version
         """
 
-        std_dev = "foo"
+        # print(f"got {x}")
+        std_dev = x
 
         self.publish(std_dev)
