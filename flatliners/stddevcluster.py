@@ -33,12 +33,9 @@ class StdDevCluster(BaseFlatliner):
         if previous:
             count = len(values) + previous['count']
             v_sum = previous['count'] * previous['mean']
-            for (t, v) in values:
-                v_sum += int(v)
-            return {'count': count, 'mean': v_sum / count}
         else:
             count = len(values)
             v_sum = 0
-            for (t, v) in values:
-                v_sum += int(v)
-            return {'count': count, 'mean': v_sum / count}
+
+        v_sum += sum(int(x[1]) for x in values)
+        return {'count': count, 'mean': v_sum / count}
