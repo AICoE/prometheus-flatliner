@@ -29,7 +29,8 @@ class StdDevCluster(BaseFlatliner):
 
         self.publish(self.clusters[cluster_id][resource])
 
-    def calculate_mean(self, values, previous = None):
+    @staticmethod
+    def calculate_mean(values, previous = None):
         if previous:
             count = len(values) + previous['count']
             v_sum = previous['count'] * previous['mean']
