@@ -18,6 +18,7 @@ class StdDevCluster(BaseFlatliner):
         # grab the resource name and the cluster id
         resource = self.metric_label(x, 'resource')
         cluster_id = self.cluster_id(x)
+        version_id = self.metric_label(x,"gitVersion")
 
         # if cluster_id is not present add it as an empty dictionary
         if cluster_id not in self.clusters:
@@ -26,14 +27,14 @@ class StdDevCluster(BaseFlatliner):
         # if the resource hasen't been seen before, do std_dev initilization
         if resource not in self.clusters[cluster_id]:
             self.clusters[cluster_id][resource] = self.calculate_stdv(self.metric_values(x), resource,
-                                                                      cluster_id)
+                                                                      cluster_id, version_id)
 
-        # if the resource exists, grab the last entry for that cluster, resource pair.
+        # if the resource exists, grab the last entry for that cluster.
         # set the new value to the updated values.
         else:
             previous = self.clusters[cluster_id][resource]
             self.clusters[cluster_id][resource] = self.calculate_stdv(self.metric_values(x), resource,
-                                                                      cluster_id, previous)
+                                                                      cluster_id, version_id, previous)
 
         self.publish(self.clusters[cluster_id][resource])
 
@@ -51,7 +52,7 @@ class StdDevCluster(BaseFlatliner):
         return {'count': count, 'mean': v_sum / count}
 
     @staticmethod
-    def calculate_stdv(values, name, cluster, previous = None):
+    def calculate_stdv(values, name, cluster, version, previous = None):
         num_entires = len(values)
         if previous:
             for x in values:
@@ -91,6 +92,6 @@ class StdDevCluster(BaseFlatliner):
                 m2 = 0
 
         return {'cluster': cluster, 'resource': name, 'std_dev': std_dev, 'm2': m2, 'mean': mean,
-                'total': total, 'count': count}
+                'total': total, 'count': count, 'version': version}
 
 
