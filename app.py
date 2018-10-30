@@ -22,9 +22,5 @@ if __name__ == '__main__':
     df_gen = flatliners.DfGenerator()
     versioned_metrics.subscribe(df_gen)
     df_gen.subscribe(print)
-    # cluster = df_gen.return_cluster()
-    # print(df)
-    # print("=======================")
-    # print(cluster.keys())
-    # print("========================")
+
     metrics.connect()

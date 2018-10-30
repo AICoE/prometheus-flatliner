@@ -5,7 +5,6 @@ name = "pypi"
 
 [packages]
 rx = "*"
-influxdb = "*"
 pandas = "*"
 
 [dev-packages]

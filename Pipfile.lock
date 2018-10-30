@@ -37,14 +37,6 @@
             ],
             "version": "==2.7"
         },
-        "influxdb": {
-            "hashes": [
-                "sha256:3ba558432d4c64293ada0deccf76527777e76750e99176d3b9dbc5a72bd4163b",
-                "sha256:9ae603939b6c3bd0eeb72fdd1d4fbc0a9c7c66a91260486f0bb0effa7d197727"
-            ],
-            "index": "pypi",
-            "version": "==5.2.0"
-        },
         "numpy": {
             "hashes": [
                 "sha256:032df9b6571c5f1d41ea6f6a189223208cb488990373aa686aca55570fcccb42",
