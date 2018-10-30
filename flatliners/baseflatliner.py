@@ -38,3 +38,6 @@ class BaseFlatliner(Observer):
 
     def cluster_id(self, x):
         return self.metric_label(x, '_id')
+
+    def alert_name(self, x):
+        return self.metric_label(x, 'alertname')

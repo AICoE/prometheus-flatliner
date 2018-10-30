@@ -3,6 +3,7 @@ from .baseflatliner import BaseFlatliner
 
 class StdDevCluster(BaseFlatliner):
     def __init__(self):
+        print(" Inside stddevcluster")
         super().__init__()
 
         self.clusters = dict()
