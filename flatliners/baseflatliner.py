@@ -41,3 +41,7 @@ class BaseFlatliner(Observer):
 
     def alert_name(self, x):
         return self.metric_label(x, 'alertname')
+
+    def get_version(self, x):
+        return self.metric_label(x, 'gitVersion')
+

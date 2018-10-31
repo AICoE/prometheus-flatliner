@@ -19,8 +19,8 @@ if __name__ == '__main__':
     # # this is something std_dev_version is interested in
     # std_dev_cluster.subscribe(std_dev_version)
     # std_dev_version.subscribe(print)
-    df_gen = flatliners.DfGenerator()
-    versioned_metrics.subscribe(df_gen)
-    df_gen.subscribe(print)
+    alert_cor = flatliners.AlertCorrelation()
+    versioned_metrics.subscribe(alert_cor)
+    alert_cor.subscribe(print)
 
     metrics.connect()

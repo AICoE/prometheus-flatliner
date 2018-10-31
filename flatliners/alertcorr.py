@@ -3,18 +3,24 @@ import pandas as pd
 from datetime import datetime
 
 
-class DfGenerator(BaseFlatliner):
+class AlertCorrelation(BaseFlatliner):
+    '''
+    This class contains the code for correlation of alerts
+
+    '''
+
     def __init__(self):
         print(" Inside alert corr")
         super().__init__()
+        ## Hold the values for different clusters
         self.clusters = dict()
         ### Empty dataframe placeholder
-        self.df = pd.DataFrame(columns=['_id', 'timestamp', 'alertname'])
+        self.df = pd.DataFrame(columns=['_id', 'timestamp', 'alertname', 'gitversion'])
         ### To keep track of previous publish
         self.timestamp = 0
 
     def on_next(self, x):
-        """ update calculate std dev for cluster
+        """ On each data loading it will create dataframe and then pivot frame
         """
         # print(f"got {x}")
 
@@ -23,6 +29,7 @@ class DfGenerator(BaseFlatliner):
 
         alert_name = self.metric_label(x, 'alertname')
         cluster_id = self.cluster_id(x)
+        git_version = self.get_version(x)
 
         if cluster_id not in self.clusters:
             self.clusters[cluster_id] = dict()
@@ -40,12 +47,15 @@ class DfGenerator(BaseFlatliner):
         timestamp = []
         cluster = []
         alert_name_list = []
+        git_version_list = []
 
         for elem in self.metric_values(x):
             timestamp.append(elem[0])
             cluster.append(cluster_id)
             alert_name_list.append(alert_name)
-        self.df = previous_df.append(pd.DataFrame({'_id': cluster, 'timestamp': timestamp, 'alertname': alert_name_list}))
+            git_version_list.append(git_version)
+        self.df = previous_df.append\
+            (pd.DataFrame({'_id': cluster, 'timestamp': timestamp, 'alertname': alert_name_list, 'gitversion': git_version_list}))
         self.df.reset_index(drop= True, inplace= True)
 
 
@@ -64,4 +74,5 @@ class DfGenerator(BaseFlatliner):
     @staticmethod
     def print_values(dataframe, timestamp):
         print("Printing for :", datetime.fromtimestamp(timestamp))
-        return dataframe.groupby(by=['_id', 'alertname']).count()
+        print(dataframe.tail(6))
+        return None
