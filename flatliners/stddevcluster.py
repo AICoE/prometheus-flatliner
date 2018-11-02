@@ -36,6 +36,7 @@ class StdDevCluster(BaseFlatliner):
             self.clusters[cluster_id][resource] = self.calculate_stdv(self.metric_values(x), resource,
                                                                       cluster_id, version_id, previous)
 
+        self.normalize_cluster(cluster_id, resource)
         self.publish(self.clusters[cluster_id][resource])
 
     @staticmethod
@@ -106,4 +107,14 @@ class StdDevCluster(BaseFlatliner):
         return {'cluster': cluster, 'resource': name, 'std_dev': std_dev, 'm2': m2, 'mean': mean,
                 'total': total, 'count': count, 'version': version}
 
-
+    def normalize_cluster(self, cluster_id, resource):
+        value = self.clusters[cluster_id][resource]['std_dev']
+        # get the othervalues:
+        resource_names = list(self.clusters[cluster_id].keys())
+        resource_list = []
+        for i in resource_names:
+            resource_list.append(self.clusters[cluster_id][i]['std_dev'])
+        max_value = max(resource_list)
+        min_value = min(resource_list)
+        if max_value != min_value:
+            self.clusters[cluster_id][resource]['std_dev'] = (value - min_value)/(max_value - min_value)
