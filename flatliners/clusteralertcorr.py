@@ -11,11 +11,11 @@ class ClusterAlertCorrelation(BaseFlatliner):
 
     def __init__(self):
         super().__init__()
-        ## Hold the values for different clusters
+        # Hold the values for different clusters
         self.clusters = dict()
-        ## TODO : save correlation over time
+        # TODO : save correlation over time
         self.clusters_correlation = dict()
-        ## To keep track of previous publish
+        # To keep track of previous publish
         self.timestamp = datetime.fromtimestamp(0)
 
     def on_next(self, x):
@@ -35,7 +35,7 @@ class ClusterAlertCorrelation(BaseFlatliner):
 
         cluster_df = self.clusters[cluster_id]
 
-        ## Dataframe creation
+        # Dataframe creation
         timestamp = []
         cluster = []
         alert_name_list = []
@@ -45,25 +45,24 @@ class ClusterAlertCorrelation(BaseFlatliner):
             cluster.append(cluster_id)
             alert_name_list.append(alert_name)
 
-        cluster_df = cluster_df.append\
-            (pd.DataFrame({'_id': cluster, 'timestamp': timestamp, 'alertname': alert_name_list}))
+        cluster_df = cluster_df.append(\
+            pd.DataFrame({'_id': cluster, 'timestamp': timestamp, 'alertname': alert_name_list}))
 
         cluster_df.reset_index(drop= True, inplace= True)
 
         self.clusters[cluster_id] = cluster_df
 
-
-        ## Publishing for every hour
+        # Publishing for every hour
         if(datetime.timestamp(timestamp[-1]) - datetime.timestamp(self.timestamp)) > 3600:
-            self.print_values(self.clusters, timestamp[-1])
+            # self.print_values(self.clusters, timestamp[-1])
             self.timestamp = timestamp[-1]
-            self.publish(self.clusters)
+            # self.publish(self.clusters)
             for clust_id in self.clusters.keys():
                 count_frame = self.count_alert_per_cluster(self.clusters[clust_id])
                 self.print_corr(count_frame, clust_id)
-                self.publish(count_frame)
+                # self.publish(count_frame)
                 corr_frame = self.corr_over_time(count_frame)
-                self.print_corr(corr_frame, clust_id, ops='Correlation')
+                # self.print_corr(corr_frame, clust_id, ops='Correlation')
                 self.publish(corr_frame)
 
     @staticmethod
