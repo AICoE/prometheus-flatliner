@@ -37,16 +37,14 @@ class ClusterAlertCorrelation(BaseFlatliner):
 
         # Dataframe creation
         timestamps = []
-        cluster = []
-        alert_name_list = []
+        alerts = []
 
         for elem in self.metric_values(x):
             timestamps.append(datetime.fromtimestamp(elem[0]))
-            cluster.append(cluster_id)
-            alert_name_list.append(alert_name)
+            alerts.append(alert_name)
 
         cluster_df = cluster_df.append(\
-            pd.DataFrame({'_id': cluster, 'timestamp': timestamps, 'alertname': alert_name_list}))
+            pd.DataFrame({'_id': [cluster_id] * len(timestamps), 'timestamp': timestamps, 'alertname': alerts}))
 
         cluster_df.reset_index(drop= True, inplace= True)
 
@@ -59,7 +57,7 @@ class ClusterAlertCorrelation(BaseFlatliner):
             # self.publish(self.clusters)
             for clust_id in self.clusters.keys():
                 count_frame = self.count_alert_per_cluster(self.clusters[clust_id])
-                self.print_corr(count_frame, clust_id)
+                #self.print_corr(count_frame, clust_id)
                 # self.publish(count_frame)
                 corr_frame = self.corr_over_time(count_frame)
                 # self.print_corr(corr_frame, clust_id, ops='Correlation')
@@ -118,5 +116,3 @@ class ClusterAlertCorrelation(BaseFlatliner):
         """
         print("Printing" + ops + " for :", cluster_id)
         print(cluster_frame.head())
-
-
