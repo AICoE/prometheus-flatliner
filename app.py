@@ -8,18 +8,20 @@ if __name__ == '__main__':
     versioned_metrics = flatliners.VersionedMetrics()
     metrics.subscribe(versioned_metrics)
 
-    # # just 2 flatliners
-    # std_dev_cluster = flatliners.StdDevCluster()
-    # std_dev_version = flatliners.StdDevVersion()
-    #
-    # # one will get versioned metrics
-    # versioned_metrics.subscribe(std_dev_cluster)
-    #
-    # # std_dev_cluster emits the std_dev for a cluster
-    # # this is something std_dev_version is interested in
-    # std_dev_cluster.subscribe(std_dev_version)
-    # std_dev_version.subscribe(print)
-    alert_cor = flatliners.AlertCorrelation()
+    # just 2 flatliners
+    std_dev_cluster = flatliners.StdDevCluster()
+    std_dev_version = flatliners.StdDevVersion()
+
+    # one will get versioned metrics
+    versioned_metrics.subscribe(std_dev_cluster)
+
+    # std_dev_cluster emits the std_dev for a cluster
+    # this is something std_dev_version is interested in
+    std_dev_cluster.subscribe(std_dev_version)
+    std_dev_version.subscribe(print)
+
+    # Alert correlation
+    alert_cor = flatliners.ClusterAlertCorrelation()
     versioned_metrics.subscribe(alert_cor)
     alert_cor.subscribe(print)
 
