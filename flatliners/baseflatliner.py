@@ -6,7 +6,6 @@ class BaseFlatliner(Observer):
     subject = None
 
     def __init__(self):
-        print("base init")
         self.subject = Subject()
 
     def on_next(self, x):

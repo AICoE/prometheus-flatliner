@@ -3,7 +3,6 @@ from .baseflatliner import BaseFlatliner
 
 class VersionedMetrics(BaseFlatliner):
     def __init__(self):
-        print(" Inside versionedmetrics")
         super().__init__()
 
         # dict for versions that we already know

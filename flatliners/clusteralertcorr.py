@@ -1,23 +1,21 @@
-import math
 import pandas as pd
 from datetime import datetime
 from .baseflatliner import BaseFlatliner
 
 class ClusterAlertCorrelation(BaseFlatliner):
 
-    '''
+    """
     This class contains the code for correlation of alerts for every cluster
 
-    '''
+    """
 
     def __init__(self):
-        print(" Inside alert corr")
         super().__init__()
         ## Hold the values for different clusters
         self.clusters = dict()
-        #TODO : save correlation over time
+        ## TODO : save correlation over time
         self.clusters_correlation = dict()
-        ### To keep track of previous publish
+        ## To keep track of previous publish
         self.timestamp = datetime.fromtimestamp(0)
 
     def on_next(self, x):
@@ -35,9 +33,9 @@ class ClusterAlertCorrelation(BaseFlatliner):
             self.clusters[cluster_id] = pd.DataFrame(columns=['_id', 'timestamp', 'alertname'])
             self.clusters_correlation[cluster_id] = pd.DataFrame()
 
-        previous_df = self.clusters[cluster_id]
+        cluster_df = self.clusters[cluster_id]
 
-        ### Dataframe creation
+        ## Dataframe creation
         timestamp = []
         cluster = []
         alert_name_list = []
@@ -46,14 +44,16 @@ class ClusterAlertCorrelation(BaseFlatliner):
             timestamp.append(datetime.fromtimestamp(elem[0]))
             cluster.append(cluster_id)
             alert_name_list.append(alert_name)
-        df = previous_df.append\
+
+        cluster_df = cluster_df.append\
             (pd.DataFrame({'_id': cluster, 'timestamp': timestamp, 'alertname': alert_name_list}))
-        df.reset_index(drop= True, inplace= True)
 
-        self.clusters[cluster_id] = df
+        cluster_df.reset_index(drop= True, inplace= True)
+
+        self.clusters[cluster_id] = cluster_df
 
 
-        ### Publishing for every hour
+        ## Publishing for every hour
         if(datetime.timestamp(timestamp[-1]) - datetime.timestamp(self.timestamp)) > 3600:
             self.print_values(self.clusters, timestamp[-1])
             self.timestamp = timestamp[-1]
@@ -63,17 +63,8 @@ class ClusterAlertCorrelation(BaseFlatliner):
                 self.print_corr(count_frame, clust_id)
                 self.publish(count_frame)
                 corr_frame = self.corr_over_time(count_frame)
-                print("Alert correlation of cluster:", clust_id, " in timestamp:", timestamp[-1],\
-                      corr_frame)
                 self.print_corr(corr_frame, clust_id, ops='Correlation')
                 self.publish(corr_frame)
-
-
-
-    def on_completed(self):
-        #print(self.clusters)
-        print("Done!")
-
 
     @staticmethod
     def print_values(dataframe_dict, timestamp):
@@ -84,19 +75,19 @@ class ClusterAlertCorrelation(BaseFlatliner):
         return None
 
     def alert_name(self, x):
-        '''
+        """
         Returns alert name of current stream
         :param x:
         :return:
-        '''
+        """
         return self.metric_label(x, 'alertname')
 
     def count_alert_per_cluster(self, cluster_frame):
-        '''
+        """
         This method counts the number of alert happening, given a time interval, on evry delta of it
         :param cluster_frame:
         :return:
-        '''
+        """
 
         df_filtered = cluster_frame
         df_filtered['value'] = 1
@@ -111,21 +102,21 @@ class ClusterAlertCorrelation(BaseFlatliner):
         return df_count_half_hour
 
     def corr_over_time(self, cluster_frame):
-        '''
+        """
         Calculate correlation between alerts
         :param cluster_frame:
         :return: correlation frame
-        '''
+        """
         return cluster_frame[cluster_frame.columns.difference(['timestamp'])].corr()
 
     def print_corr(self, cluster_frame, cluster_id, ops = 'Value'):
-        '''
+        """
         Print correlation or count matrix/frame depending on ops
         :param cluster_frame:
         :param cluster_id:
         :param ops:
         :return:
-        '''
+        """
         print("Printing" + ops + " for :", cluster_id)
         print(cluster_frame.head())
 

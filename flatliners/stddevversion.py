@@ -3,7 +3,6 @@ from .baseflatliner import BaseFlatliner
 
 class StdDevVersion(BaseFlatliner):
     def __init__(self):
-        print(" Inside stddevversion")
         super().__init__()
 
     def on_next(self, x):
