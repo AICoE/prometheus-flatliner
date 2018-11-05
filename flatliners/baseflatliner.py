@@ -6,7 +6,6 @@ class BaseFlatliner(Observer):
     subject = None
 
     def __init__(self):
-        print("base init")
         self.subject = Subject()
 
     def on_next(self, x):
@@ -38,3 +37,10 @@ class BaseFlatliner(Observer):
 
     def cluster_id(self, x):
         return self.metric_label(x, '_id')
+
+    def cluster_version(self, x):
+        return self.metric_label(x, 'gitVersion')
+
+
+
+

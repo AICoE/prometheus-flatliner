@@ -26,5 +26,11 @@ if __name__ == '__main__':
     std_dev_version.subscribe(comparison_score)
     comparison_score.subscribe(print)
 
+    # Alert correlation
+    alert_cor = flatliners.ClusterAlertCorrelation()
+    versioned_metrics.subscribe(alert_cor)
+    alert_cor.subscribe(print)
+
     # connect the metrics stream to publish data
     metrics.connect()
+    
