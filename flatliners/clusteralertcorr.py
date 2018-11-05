@@ -36,26 +36,26 @@ class ClusterAlertCorrelation(BaseFlatliner):
         cluster_df = self.clusters[cluster_id]
 
         # Dataframe creation
-        timestamp = []
+        timestamps = []
         cluster = []
         alert_name_list = []
 
         for elem in self.metric_values(x):
-            timestamp.append(datetime.fromtimestamp(elem[0]))
+            timestamps.append(datetime.fromtimestamp(elem[0]))
             cluster.append(cluster_id)
             alert_name_list.append(alert_name)
 
         cluster_df = cluster_df.append(\
-            pd.DataFrame({'_id': cluster, 'timestamp': timestamp, 'alertname': alert_name_list}))
+            pd.DataFrame({'_id': cluster, 'timestamp': timestamps, 'alertname': alert_name_list}))
 
         cluster_df.reset_index(drop= True, inplace= True)
 
         self.clusters[cluster_id] = cluster_df
 
         # Publishing for every hour
-        if(datetime.timestamp(timestamp[-1]) - datetime.timestamp(self.timestamp)) > 3600:
+        if(datetime.timestamp(timestamps[-1]) - datetime.timestamp(self.timestamp)) > 3600:
             # self.print_values(self.clusters, timestamp[-1])
-            self.timestamp = timestamp[-1]
+            self.timestamp = timestamps[-1]
             # self.publish(self.clusters)
             for clust_id in self.clusters.keys():
                 count_frame = self.count_alert_per_cluster(self.clusters[clust_id])
