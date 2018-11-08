@@ -25,7 +25,8 @@ class ComparisonScore(BaseFlatliner):
         if is_cluster_record:
             cluster_id = x['cluster']
             self.compute_cluster_distance(self.clusters, self.versions, x, self.score)
-            self.publish(self.score[cluster_id])
+            if self.ready_to_publish(x):
+                self.publish(self.score[cluster_id])
 
     @staticmethod
     def set_version_std(version_records, values):
@@ -55,3 +56,12 @@ class ComparisonScore(BaseFlatliner):
         # store final, single value for each cluster in scores.
         cluster_records[cluster_id][resource] = (value - version_records[version_id][resource])**2
         scores[cluster_id] = (sum(list(cluster_records[cluster_id].values())))**0.5
+
+    def ready_to_publish(self, x):
+        cluster_id = x['cluster']
+        resoure_name = x['resource']
+
+        if resoure_name in self.clusters[cluster_id].keys():
+            return True
+        else:
+            return False
