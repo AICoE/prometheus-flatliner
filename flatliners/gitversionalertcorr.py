@@ -114,8 +114,8 @@ class GitVersionAlertCorrelation(BaseFlatliner):
         """
         return self.metric_label(x, 'alertname')
 
-
-    def print_git_frame(self, git_frame, git_version, ops='Value'):
+    @staticmethod
+    def print_git_frame(git_frame, git_version, ops='Value'):
         """
 
         :param git_frame:
