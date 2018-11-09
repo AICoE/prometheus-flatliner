@@ -38,4 +38,3 @@ if __name__ == '__main__':
 
     # connect the metrics stream to publish data
     metrics.connect()
-    
