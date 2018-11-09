@@ -90,21 +90,11 @@ class GitVersionAlertCorrelation(BaseFlatliner):
                 for elem in columns:
                     if elem not in self.unique_alert_combination:
                         self.unique_alert_combination.append(elem)
-                '''
-                self.unique_alert_comb.extend(columns)
-                self.unique_alert_comb = list(set(unique_alert_comb))'''
-            ### Publishing correlation shift of every git version
+
+                # self.unique_alert_comb.extend(columns)
+                # self.unique_alert_comb = list(set(unique_alert_comb))
+            # Publishing correlation shift of every git version
             self.publish(all_git_version_corr_shift)
-
-
-
-    @staticmethod
-    def print_values(dataframe_dict, timestamp):
-        print("Printing for :", timestamp)
-        for key in dataframe_dict.keys():
-            print("Cluster_id:", key, " in timestamp:", timestamp)
-            print(dataframe_dict[key])
-        return None
 
     def alert_name(self, x):
         """
@@ -113,18 +103,6 @@ class GitVersionAlertCorrelation(BaseFlatliner):
         :return:
         """
         return self.metric_label(x, 'alertname')
-
-    @staticmethod
-    def print_git_frame(git_frame, git_version, ops='Value'):
-        """
-
-        :param git_frame:
-        :param git_version:
-        :param ops:
-        :return:
-        """
-        print("Printing" + ops + " for :", git_version)
-        print(git_frame.head())
 
     def corr_change_over_build_and_time(self, git_version, pivot_frame_dict):
         """
@@ -175,3 +153,25 @@ class GitVersionAlertCorrelation(BaseFlatliner):
         :return:
         """
         return self.clusters_version_correlation[git_version]
+
+    @staticmethod
+    def print_values(dataframe_dict, timestamp):
+        print("Printing for :", timestamp)
+        for key in dataframe_dict.keys():
+            print("Cluster_id:", key, " in timestamp:", timestamp)
+            print(dataframe_dict[key])
+        return None
+
+
+
+    @staticmethod
+    def print_git_frame(git_frame, git_version, ops='Value'):
+        """
+
+        :param git_frame:
+        :param git_version:
+        :param ops:
+        :return:
+        """
+        print("Printing" + ops + " for :", git_version)
+        print(git_frame.head())
