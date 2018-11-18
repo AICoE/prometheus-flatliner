@@ -1,5 +1,8 @@
+import math
+import numpy as np
 import pandas as pd
 from datetime import datetime
+from itertools import combinations
 from .baseflatliner import BaseFlatliner
 
 class ClusterAlertCorrelation(BaseFlatliner):
@@ -13,7 +16,7 @@ class ClusterAlertCorrelation(BaseFlatliner):
         super().__init__()
         # Hold the values for different clusters
         self.clusters = dict()
-        # TODO : save correlation over time
+        # Hold 1-D vector for every cluster id of alert to alert correlation
         self.clusters_correlation = dict()
         # To keep track of previous publish
         self.timestamp = datetime.fromtimestamp(0)
@@ -61,7 +64,27 @@ class ClusterAlertCorrelation(BaseFlatliner):
                 # self.publish(count_frame)
                 corr_frame = self.corr_over_time(count_frame)
                 # self.print_corr(corr_frame, clust_id, ops='Correlation')
-                self.publish(corr_frame)
+
+                # 1-D vector generation
+                L = list(corr_frame.columns.values)
+                mask = np.zeros_like(corr_frame, dtype=np.bool)
+                mask[np.triu_indices_from(mask)] = True
+                corr_frame = corr_frame.mask(mask)
+
+                alert_combination_list = []
+                alert_combination_value_list = []
+                for elm in list(combinations(L, 2)):
+                    try:
+                        val = corr_frame.get_value(index=elm[1], col=elm[0])
+
+                    except KeyError:
+                        val = math.nan
+                    alert_combination_list.append('_'.join(elm))
+                    alert_combination_value_list.append(val)
+
+                self.clusters_correlation[clust_id] = pd.DataFrame(data = [alert_combination_value_list], columns = alert_combination_list)
+
+            self.publish(self.clusters_correlation)
 
     @staticmethod
     def print_values(dataframe_dict, timestamp):
