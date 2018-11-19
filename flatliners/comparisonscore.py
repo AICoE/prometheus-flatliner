@@ -56,11 +56,11 @@ class ComparisonScore(BaseFlatliner):
         self.score[cluster_id] = {'cluster': cluster_id, 'score': (sum(list(self.clusters[cluster_id].values())))**0.5 }
 
 
-      def ready_to_publish(self, x):
-              cluster_id = x['cluster']
-              resoure_name = x['resource']
-
-              if resoure_name in self.clusters[cluster_id].keys():
-                  return True
-              else:
-                  return False
+    def ready_to_publish(self, x):
+          cluster_id = x['cluster']
+          resoure_name = x['resource']
+        
+          if resoure_name in self.clusters[cluster_id].keys():
+              return True
+          else:
+              return False
