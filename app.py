@@ -31,6 +31,10 @@ if __name__ == '__main__':
     versioned_metrics.subscribe(alert_cor)
     alert_cor.subscribe(print)
 
+    # Git version alert correlation
+    version_alert_corr = flatliners.GitVersionAlertCorrelation()
+    versioned_metrics.subscribe(version_alert_corr)
+    version_alert_corr.subscribe(print)
+
     # connect the metrics stream to publish data
     metrics.connect()
-    
