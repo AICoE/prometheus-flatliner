@@ -6,9 +6,9 @@ name = "pypi"
 [packages]
 rx = "*"
 pandas = "*"
-pytest = "*"
 
 [dev-packages]
+pytest = "*"
 
 [requires]
 python_version = "3.6"
