@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 rx = "*"
 pandas = "*"
+pytest = "*"
 
 [dev-packages]
 
