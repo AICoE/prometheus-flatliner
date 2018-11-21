@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     std_dev_cluster.subscribe(comparison_score)
     std_dev_version.subscribe(comparison_score)
-    comparison_score.subscribe(print)
+    #comparison_score.subscribe(print)
 
     # Alert correlation
     alert_cor = flatliners.ClusterAlertCorrelation()
@@ -34,12 +34,25 @@ if __name__ == '__main__':
 
     # Git version alert correlation
     version_alert_corr = flatliners.GitVersionAlertCorrelation()
+
     versioned_metrics.subscribe(version_alert_corr)
     #version_alert_corr.subscribe(print) # this emits a df with correlation values for a gitVersion
 
-    version_alert_corr.subscribe(corr_comparison_score)
+
     alert_cor.subscribe(corr_comparison_score)
-    corr_comparison_score.subscribe(print)
+
+    version_alert_corr.subscribe(corr_comparison_score)
+
+
+
+    #corr_comparison_score.subscribe(print)
+
+    weirdness_score = flatliners.WeirdnessScore()
+    comparison_score.subscribe(weirdness_score)
+    corr_comparison_score.subscribe(weirdness_score)
+    weirdness_score.subscribe(print)
+
+
 
     # connect the metrics stream to publish data
     metrics.connect()

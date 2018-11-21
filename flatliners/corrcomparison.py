@@ -16,7 +16,6 @@ class CorrComparisonScore(BaseFlatliner):
         """
         # determine entry type
         entry_type = 'unkown'
-        
         if isinstance(x[list(x.keys())[0]], pandas.core.frame.DataFrame):
             entry_type = 'version'
 
@@ -29,19 +28,20 @@ class CorrComparisonScore(BaseFlatliner):
 
         if entry_type == 'cluster':
             self.clusters = x
-            # Calculate/update the distances for each available cluster
-            for cluster_name in self.clusters.keys():
-                cluster_version = self.clusters[cluster_name]['version']
-                # confirm version records have data for current cluster version
-                if cluster_version in self.versions.keys():
-                    # get vectors and remove NaN's
-                    version_data, cluster_data = self.preprocess_data(cluster_name)
-                    # confirm version and cluster vectors match
-                    if version_data.shape == cluster_data.shape:
-                        # calculate distance
-                        self.compute_cluster_distance(version_data, cluster_data, cluster_name)
 
-                        self.publish(self.score[cluster_name])
+        # Calculate/update the distances for each available cluster
+        for cluster_name in self.clusters.keys():
+            cluster_version = self.clusters[cluster_name]['version']
+            # confirm version records have data for current cluster version
+            if cluster_version in self.versions.keys():
+                # get vectors and remove NaN's
+                version_data, cluster_data = self.preprocess_data(cluster_name)
+                # confirm version and cluster vectors match
+                if version_data.shape == cluster_data.shape:
+                    # calculate distance
+                    self.compute_cluster_distance(version_data, cluster_data, cluster_name)
+
+                    self.publish(self.score[cluster_name])
 
 
     def compute_cluster_distance(self, version_data, cluster_data, cluster_name):

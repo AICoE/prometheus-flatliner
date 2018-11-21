@@ -6,3 +6,4 @@ from .clusteralertcorr import ClusterAlertCorrelation
 from .comparisonscore import ComparisonScore
 from .gitversionalertcorr import GitVersionAlertCorrelation
 from .corrcomparison import CorrComparisonScore
+from .weirdnessscore import WeirdnessScore
