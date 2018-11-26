@@ -25,7 +25,9 @@ class ComparisonScore(BaseFlatliner):
         if is_cluster_record:
             cluster_id = x['cluster']
             self.compute_cluster_distance(x)
-            self.publish(self.score[cluster_id])
+            if self.ready_to_publish(x):
+                self.publish(self.score[cluster_id])
+
 
     def set_version_std(self, values):
         # select necessary values
@@ -51,4 +53,15 @@ class ComparisonScore(BaseFlatliner):
         # and then take the square root of the sum to calculate the Euclidean distance between vectors.
         # store final, single value for each cluster in scores.
         self.clusters[cluster_id][resource] = (value - self.versions[version_id][resource])**2
-        self.score[cluster_id] = {'cluster': cluster_id, 'score': (sum(list(self.clusters[cluster_id].values())))**0.5 }
+        self.score[cluster_id] = {'cluster': cluster_id, 'std_norm': (sum(list(self.clusters[cluster_id].values())))**0.5 }
+
+
+    def ready_to_publish(self, x):
+          cluster_id = x['cluster']
+          resoure_name = x['resource']
+        
+          if resoure_name in self.clusters[cluster_id].keys():
+              return True
+          else:
+              return False
+
