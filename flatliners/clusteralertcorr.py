@@ -31,6 +31,7 @@ class ClusterAlertCorrelation(BaseFlatliner):
 
         alert_name = self.metric_label(x, 'alertname')
         cluster_id = self.cluster_id(x)
+        version_id = self.metric_label(x, 'gitVersion')
 
         if cluster_id not in self.clusters:
             self.clusters[cluster_id] = pd.DataFrame(columns=['_id', 'timestamp', 'alertname'])
@@ -82,9 +83,13 @@ class ClusterAlertCorrelation(BaseFlatliner):
                     alert_combination_list.append('_'.join(elm))
                     alert_combination_value_list.append(val)
 
-                self.clusters_correlation[clust_id] = pd.DataFrame(data = [alert_combination_value_list], columns = alert_combination_list)
+                self.clusters_correlation[clust_id] = {'dataframe': pd.DataFrame(data = [alert_combination_value_list],
+                                                                    columns = alert_combination_list),
+                                                       'version': version_id}
+
 
             self.publish(self.clusters_correlation)
+            #self.publish(cluster_id)
 
     @staticmethod
     def print_values(dataframe_dict, timestamp):
