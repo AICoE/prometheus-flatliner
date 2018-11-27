@@ -7,3 +7,4 @@ from .comparisonscore import ComparisonScore
 from .gitversionalertcorr import GitVersionAlertCorrelation
 from .corrcomparison import CorrComparisonScore
 from .weirdnessscore import WeirdnessScore
+from .influxdbstorage import InfluxdbStorage

@@ -1,5 +1,7 @@
 import flatliners
 import metrics
+import os
+
 
 if __name__ == '__main__':
     metrics = metrics.FileMetrics() # this is an observable that streams in all the data alerts->etcd->build
@@ -52,6 +54,9 @@ if __name__ == '__main__':
     corr_comparison_score.subscribe(weirdness_score)
     weirdness_score.subscribe(print)
 
+    if "FLT_INFLUX_HOST" in os.environ:
+        influxdb_storage = flatliners.InfluxdbStorage()
+        weirdness_score.subscribe(influxdb_storage)
 
 
     # connect the metrics stream to publish data
