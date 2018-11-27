@@ -11,7 +11,7 @@ class WeirdnessScore(BaseFlatliner):
     def on_next(self, x):
 
         cluster_name = x['cluster']
-        #sumself.publish(x)
+        #self.publish(x)
 
         if cluster_name not in self.score:
             self.score[cluster_name] = dict()

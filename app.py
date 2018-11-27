@@ -51,7 +51,7 @@ if __name__ == '__main__':
     weirdness_score = flatliners.WeirdnessScore()
     comparison_score.subscribe(weirdness_score)
     corr_comparison_score.subscribe(weirdness_score)
-    #weirdness_score.subscribe(print)
+    weirdness_score.subscribe(print)
 
     influxdb_storage = flatliners.InfluxdbStorage()
     weirdness_score.subscribe(influxdb_storage)

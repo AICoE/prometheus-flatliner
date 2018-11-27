@@ -15,8 +15,6 @@ class InfluxdbStorage(BaseFlatliner):
         client.switch_database('flatliner')
         client.write_points([{"measurement": "clusterdata",
         "tags": {
-            "user": "unkown",
-            "brushId": "unkown"
+            "clusterID": x['cluster']
         },
-        #"time": time.time(), # TODO: set the right timeformat for influx
         "fields": x}], time_precision='ms')
