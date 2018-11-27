@@ -1,5 +1,6 @@
 import flatliners
 import metrics
+import os
 
 
 if __name__ == '__main__':
@@ -53,8 +54,9 @@ if __name__ == '__main__':
     corr_comparison_score.subscribe(weirdness_score)
     weirdness_score.subscribe(print)
 
-    influxdb_storage = flatliners.InfluxdbStorage()
-    weirdness_score.subscribe(influxdb_storage)
+    if "FLT_INFLUX_HOST" in os.environ:
+        influxdb_storage = flatliners.InfluxdbStorage()
+        weirdness_score.subscribe(influxdb_storage)
 
 
     # connect the metrics stream to publish data
