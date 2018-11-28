@@ -4,6 +4,10 @@ import os
 
 from rx import Observable
 
+# Scheduling stuff
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+import atexit
 
 class FileMetrics:
     def __init__(self):
@@ -16,7 +20,19 @@ class FileMetrics:
         self.observable.connect()
 
     def push_metrics(self, observer):
-        self.load_files(observer)
+        # Scheduler schedules a background job that needs to be run regularly
+        scheduler = BackgroundScheduler()
+        scheduler.start()
+        scheduler.add_job(
+            func=lambda: self.load_files(observer), # Run this function every 10 seconds to poll for new metric data
+            trigger=IntervalTrigger(seconds=10),
+            id='update_metric_data',
+            name='Ticker to get new data from prometheus',
+            replace_existing=True)
+
+        # Shut down the scheduler when exiting the app
+        atexit.register(lambda: scheduler.shutdown())
+        # self.load_files(observer)
         # observer.on_next(randint(1, 10000000))
 
     def load_files(self, observer):

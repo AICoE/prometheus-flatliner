@@ -1,0 +1,5 @@
+apscheduler
+rx
+pandas
+influxdb
+
