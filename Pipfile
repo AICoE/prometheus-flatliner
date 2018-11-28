@@ -4,9 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+apscheduler = "*"
 rx = "*"
 pandas = "*"
 influxdb = "*"
+
 
 [dev-packages]
 pytest = "*"

@@ -2,9 +2,10 @@ import flatliners
 import metrics
 import os
 
+import time
 
 if __name__ == '__main__':
-    metrics = metrics.FileMetrics() # this is an observable that streams in all the data alerts->etcd->build
+    metrics = metrics.PromMetrics() # this is an observable that streams in all the data alerts->etcd->build
 
     # subscribe versioned metrics, which adds the version to the metrics stream
     # to metrics. Every metric emitted by metrics is sent to versioned_metrics
@@ -61,3 +62,8 @@ if __name__ == '__main__':
 
     # connect the metrics stream to publish data
     metrics.connect()
+
+while True:
+    print("Working")
+    time.sleep(100)
+    pass
