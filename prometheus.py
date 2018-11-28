@@ -2,13 +2,14 @@ from urllib.parse import urlparse
 import requests
 import datetime
 import json
-
+import time
 # Disable SSL warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 DEBUG = False
 MAX_REQUEST_RETRIES = 5
+CONNECTION_RETRY_WAIT_TIME = 5
 
 class Prometheus:
     """docstring for Prometheus."""
@@ -69,7 +70,7 @@ class Prometheus:
                 print("Invalid Data Size, using default value: {}".format(self.stored_data_range))
             pass
 
-        if not name in self.all_metrics():
+        if name not in self.all_metrics():
             raise Exception("{} is not a valid metric".format(name))
         elif DEBUG:
             print("Metric is valid.")
@@ -82,7 +83,7 @@ class Prometheus:
 
 
     def get_metrics_from_prom(self, name, chunks):
-        if not name in self.all_metrics():
+        if name not in self.all_metrics():
             raise Exception("{} is not a valid metric".format(name))
 
         # start = self.start_time.timestamp()
@@ -127,7 +128,7 @@ class Prometheus:
                         return False
                     else:
                         print("Retry Count: ",tries)
-                        sleep(CONNECTION_RETRY_WAIT_TIME)    # Wait for a second before making a new request
+                        time.sleep(CONNECTION_RETRY_WAIT_TIME)    # Wait for a second before making a new request
                 else:
                     if tries >= MAX_REQUEST_RETRIES:
                         self.connection_errors_count+=1
@@ -138,7 +139,7 @@ class Prometheus:
                         ))
                     else:
                         print("Retry Count: ",tries)
-                        sleep(CONNECTION_RETRY_WAIT_TIME)
+                        time.sleep(CONNECTION_RETRY_WAIT_TIME)
 
             start += chunk_size
 
