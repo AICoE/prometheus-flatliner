@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 from rx import Observable
 
@@ -36,13 +37,12 @@ class PromMetrics:
 
         atexit.register(lambda: scheduler.shutdown()) # Shut down the scheduler when exiting the app
 
-    def _get_metrics_from_prometheus(self, observer):
+    def _get_metrics_from_prometheus(self, observer=None):
         # Collect credentials to connect to a prometheus instance
-        prom_token = os.getenv("PROM_ACCESS_TOKEN",None)
-        prom_url = os.getenv("PROM_URL",None)
+        prom_token = os.getenv("PROM_ACCESS_TOKEN")
+        prom_url = os.getenv("PROM_URL")
         if not (prom_token or prom_url):
-            print("Prometheus credentials not found")
-            exit(0)
+            sys.exit("Error: Prometheus credentials not found")
 
 
         prom = Prometheus(url=prom_url, token=prom_token, data_chunk='5m',stored_data='5m')
@@ -51,7 +51,15 @@ class PromMetrics:
 
         print("Polling Prometheus for new metric data")
 
-        for metric in metrics_list:
-            pkt = (json.loads(prom.get_metric(name=metric))[0])
-            observer.on_next(pkt) # push metric data to the Observer
-        pass
+        metric_data = dict()
+        if observer:
+            for metric in metrics_list:
+                pkt = (json.loads(prom.get_metric(name=metric))[0])
+                metric_data[metric] = pkt
+                observer.on_next(pkt) # push metric data to the Observer
+            pass
+        else:
+            for metric in metrics_list:
+                metric_data[metric] = (json.loads(prom.get_metric(name=metric))[0])
+
+        return(metric_data)
