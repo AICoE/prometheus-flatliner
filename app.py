@@ -5,7 +5,7 @@ import os
 import time
 
 if __name__ == '__main__':
-    metrics = metrics.PromMetrics() # this is an observable that streams in all the data alerts->etcd->build
+    metrics = metrics.FileMetrics() # this is an observable that streams in all the data alerts->etcd->build
 
     # subscribe versioned metrics, which adds the version to the metrics stream
     # to metrics. Every metric emitted by metrics is sent to versioned_metrics
