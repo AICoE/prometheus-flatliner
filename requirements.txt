@@ -1,5 +1,0 @@
-apscheduler
-rx
-pandas
-influxdb
-
