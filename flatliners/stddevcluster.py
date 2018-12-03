@@ -37,6 +37,7 @@ class StdDevCluster(BaseFlatliner):
                                                                       cluster_id, version_id, previous)
 
         self.normalize_cluster(cluster_id, resource)
+        self.clusters[cluster_id][resource]["timestamp"] = x["values"][0][0]
         self.publish(self.clusters[cluster_id][resource])
 
     @staticmethod

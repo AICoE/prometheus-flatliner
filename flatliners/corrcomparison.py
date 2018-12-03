@@ -40,7 +40,8 @@ class CorrComparisonScore(BaseFlatliner):
                 if version_data.shape == cluster_data.shape:
                     # calculate distance
                     self.compute_cluster_distance(version_data, cluster_data, cluster_name)
-
+                    timestamp = self.clusters[cluster_name]['timestamp']
+                    self.score[cluster_name]["timestamp"] = timestamp
                     self.publish(self.score[cluster_name])
 
 

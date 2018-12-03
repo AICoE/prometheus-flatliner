@@ -2,6 +2,7 @@ from .baseflatliner import BaseFlatliner
 
 from influxdb import InfluxDBClient
 import os
+from datetime import datetime
 
 class InfluxdbStorage(BaseFlatliner):
     def __init__(self):
@@ -12,9 +13,11 @@ class InfluxdbStorage(BaseFlatliner):
         """ update l2 distance between cluster vector and baseline vector
         """
         client = InfluxDBClient(host=os.environ['FLT_INFLUX_HOST'], port=8086)
-        client.switch_database('flatliner')
+        client.switch_database('prometheus_flatliner')
+
         client.write_points([{"measurement": "clusterdata",
         "tags": {
             "clusterID": x['cluster']
         },
-        "fields": x}], time_precision='ms')
+        "time": datetime.utcfromtimestamp(x['timestamp_std']).strftime('%Y-%m-%dT%H:%M:%SZ'),
+        "fields": x}])
