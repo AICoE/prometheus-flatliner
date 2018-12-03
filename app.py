@@ -5,7 +5,6 @@ import os
 
 if __name__ == '__main__':
     metrics = metrics.FileMetrics() # this is an observable that streams in all the data alerts->etcd->build
-
     # subscribe versioned metrics, which adds the version to the metrics stream
     # to metrics. Every metric emitted by metrics is sent to versioned_metrics
     versioned_metrics = flatliners.VersionedMetrics() # initilizes an observer that operates on our data
@@ -44,8 +43,6 @@ if __name__ == '__main__':
     alert_cor.subscribe(corr_comparison_score)
 
     version_alert_corr.subscribe(corr_comparison_score)
-
-
 
     #corr_comparison_score.subscribe(print)
 

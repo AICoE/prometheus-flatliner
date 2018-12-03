@@ -53,7 +53,8 @@ class ComparisonScore(BaseFlatliner):
         # and then take the square root of the sum to calculate the Euclidean distance between vectors.
         # store final, single value for each cluster in scores.
         self.clusters[cluster_id][resource] = (value - self.versions[version_id][resource])**2
-        self.score[cluster_id] = {'cluster': cluster_id, 'std_norm': (sum(list(self.clusters[cluster_id].values())))**0.5 }
+        self.score[cluster_id] = {'cluster': cluster_id, 'std_norm': (sum(list(self.clusters[cluster_id].values())))**0.5,
+                                  "timestamp": values["timestamp"]}
 
 
     def ready_to_publish(self, x):

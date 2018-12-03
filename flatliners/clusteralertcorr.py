@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import pandas as pd
+import time
 from datetime import datetime
 from itertools import combinations
 from .baseflatliner import BaseFlatliner
@@ -83,9 +84,11 @@ class ClusterAlertCorrelation(BaseFlatliner):
                     alert_combination_list.append('_'.join(elm))
                     alert_combination_value_list.append(val)
 
+                tuple_timestamp = time.mktime(self.timestamp.timetuple())
                 self.clusters_correlation[clust_id] = {'dataframe': pd.DataFrame(data = [alert_combination_value_list],
                                                                     columns = alert_combination_list),
-                                                       'version': version_id}
+                                                       'version': version_id,
+                                                       'timestamp': tuple_timestamp}
 
 
             self.publish(self.clusters_correlation)
