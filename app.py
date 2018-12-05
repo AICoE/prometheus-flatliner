@@ -1,10 +1,17 @@
 import flatliners
 import metrics
 import os
+import sys
 
 
 if __name__ == '__main__':
-    metrics_list = ['openshift_build_info', 'etcd_object_counts', 'alerts']
+    metrics_list = os.getenv("METRICS_LIST")
+    if metrics_list:
+        metrics_list = str(metrics_list).split(",")
+        print("This metrics initialized were: ",metrics_list)
+    else:
+        sys.exit("Error: Metrics List not initialized")
+
     metrics = metrics.PromMetrics(metrics_list=metrics_list,
                                 metric_start_datetime='14 Sept 2018',
                                 metric_end_datetime='16 Sept 2018',
