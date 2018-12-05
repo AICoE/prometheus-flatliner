@@ -8,14 +8,17 @@ if __name__ == '__main__':
     metrics_list = os.getenv("METRICS_LIST")
     if metrics_list:
         metrics_list = str(metrics_list).split(",")
-        print("This metrics initialized were: ",metrics_list)
+        print("The metrics initialized were: ",metrics_list)
+        metric_start_datetime = os.getenv("METRIC_START_DATETIME","14 Sept 2018")
+        metric_end_datetime = os.getenv("METRIC_END_DATETIME","16 Sept 2018")
+        metric_chunk_size = os.getenv("METRIC_CHUNK_SIZE","1h")
     else:
         sys.exit("Error: Metrics List not initialized")
 
     metrics = metrics.PromMetrics(metrics_list=metrics_list,
-                                metric_start_datetime='14 Sept 2018',
-                                metric_end_datetime='16 Sept 2018',
-                                metric_chunk_size='1h') # this is an observable that streams in all the data alerts->etcd->build
+                                metric_start_datetime=metric_start_datetime,
+                                metric_end_datetime=metric_end_datetime,
+                                metric_chunk_size=metric_chunk_size) # this is an observable that streams in all the data alerts->etcd->build
 
     # subscribe versioned metrics, which adds the version to the metrics stream
     # to metrics. Every metric emitted by metrics is sent to versioned_metrics
