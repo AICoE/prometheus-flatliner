@@ -1,15 +1,22 @@
 import flatliners
 import metrics
 import os
+import sys
 
+from prometheus import Prometheus
 
 if __name__ == '__main__':
-    metrics = metrics.FileMetrics() # this is an observable that streams in all the data alerts->etcd->build
+    metrics_list = ['openshift_build_info', 'etcd_object_counts', 'alerts']
+    metrics = metrics.PromMetrics(metrics_list=metrics_list,
+                                metric_start_datetime='14 Sept 2018',
+                                metric_end_datetime='16 Sept 2018',
+                                metric_chunk_size='1h') # this is an observable that streams in all the data alerts->etcd->build
+
     # subscribe versioned metrics, which adds the version to the metrics stream
     # to metrics. Every metric emitted by metrics is sent to versioned_metrics
     versioned_metrics = flatliners.VersionedMetrics() # initilizes an observer that operates on our data
     metrics.subscribe(versioned_metrics) # creates versioned_metrics that adds version to etcd data
-
+    # metrics.subscribe(print)
 
     # just 2 flatliners
     std_dev_cluster = flatliners.StdDevCluster() # this is an observer that operates on some cluster data
@@ -43,6 +50,8 @@ if __name__ == '__main__':
     alert_cor.subscribe(corr_comparison_score)
 
     version_alert_corr.subscribe(corr_comparison_score)
+
+
 
     #corr_comparison_score.subscribe(print)
 
