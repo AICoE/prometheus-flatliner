@@ -182,7 +182,6 @@ class Prometheus:
 
         if int(end-start) < chunk_seconds:
             sys.exit("specified chunk_size is too big")
-            pass
 
         if label_config:
             label_list = [str(key+"="+ "'" + label_config[key]+ "'") for key in label_config]
@@ -201,7 +200,6 @@ class Prometheus:
                                 headers=self.headers)
             if response.status_code == 200:
                 data += response.json()['data']['result']
-                pass
             else:
                 raise Exception("HTTP Status Code {} {} ({})".format(
                     response.status_code,
