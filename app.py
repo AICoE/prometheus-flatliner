@@ -1,9 +1,7 @@
 import flatliners
 import metrics
 import os
-import sys
 
-from prometheus import Prometheus
 
 if __name__ == '__main__':
     metrics_list = ['openshift_build_info', 'etcd_object_counts', 'alerts']

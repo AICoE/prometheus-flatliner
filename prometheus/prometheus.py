@@ -5,11 +5,12 @@ import json
 import time
 import dateparser
 import sys
+from retrying import retry
+
 # Disable SSL warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-from retrying import retry
 
 
 DEBUG = False
