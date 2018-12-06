@@ -1,7 +1,6 @@
 import flatliners
 import metrics
 import os
-import sys
 
 
 def main():
@@ -9,9 +8,9 @@ def main():
     if metrics_list:    # If the env variable for FLT_METRICS_LIST is set, pull data from Prometheus
         metrics_list = str(metrics_list).split(",")
         print("The metrics initialized were: ",metrics_list)
-        metric_start_datetime = os.getenv("FLT_METRIC_START_DATETIME","17 October 2018")
-        metric_end_datetime = os.getenv("FLT_METRIC_END_DATETIME","18 October 2018")
-        metric_chunk_size = os.getenv("FLT_METRIC_CHUNK_SIZE","12h")
+        metric_start_datetime = os.getenv("FLT_METRIC_START_DATETIME","17 Oct 2018 1pm")
+        metric_end_datetime = os.getenv("FLT_METRIC_END_DATETIME","17 Oct 2018 10pm")
+        metric_chunk_size = os.getenv("FLT_METRIC_CHUNK_SIZE","30m")
 
         metrics_observable = metrics.PromMetrics(metrics_list=metrics_list,
                                     metric_start_datetime=metric_start_datetime,

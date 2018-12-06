@@ -37,21 +37,21 @@ class PromMetrics:
 
     def observe_prom_metrics_range(self, observer, metrics_list, start_time, end_time='now', chunk_size='1h'):
         # Collect credentials to connect to a prometheus instance
-        prom_token = os.getenv("PROM_ACCESS_TOKEN")
-        prom_url = os.getenv("PROM_URL")
+        prom_token = os.getenv("FLT_PROM_ACCESS_TOKEN")
+        prom_url = os.getenv("FLT_PROM_URL")
         if not (prom_token or prom_url):
             sys.exit("Error: Prometheus credentials not found")
         prom = Prometheus(url=prom_url, token=prom_token)
 
         # Calculate chunk size to download and push to the observer at each instance
         chunk_seconds = int(round((dateparser.parse('now') - dateparser.parse(chunk_size)).total_seconds()))
-
+        print("Collecting metric data within datetime range:{0} - {1}".format(dateparser.parse(start_time),dateparser.parse(end_time)))
         start = dateparser.parse(start_time).timestamp()
         end = dateparser.parse(end_time).timestamp()
 
         while start <= end:     # Main loop which iterates through time-ranges to collect a chunk of data at every iteration
             for metric_name in metrics_list:    # Loop to get a chunk of data for every metric in the list
-                pkt_list = json.loads(prom.get_metric_range_data(metric_name=metric_name, start_time=start, end_time=end))
+                pkt_list = (prom.get_metric_range_data(metric_name=metric_name, start_time=start, end_time=end))
 
                 for pkt in pkt_list:        # pkt_list contains a list of data for multiple metrics, each of which is pushed to the observer.
                     try:
