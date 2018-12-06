@@ -2,6 +2,7 @@ from .baseflatliner import BaseFlatliner
 
 import numpy as np
 import pandas
+from dataclasses import dataclass
 
 class CorrComparisonScore(BaseFlatliner):
     def __init__(self):
@@ -42,7 +43,14 @@ class CorrComparisonScore(BaseFlatliner):
                     self.compute_cluster_distance(version_data, cluster_data, cluster_name)
                     timestamp = self.clusters[cluster_name]['timestamp']
                     self.score[cluster_name]["timestamp"] = timestamp
-                    self.publish(self.score[cluster_name])
+
+                    data = CORR_COMPARISON()
+                    data.cluster = cluster_name
+                    data.corr_norm = self.score[cluster_name]['corr_norm']
+                    data.timestamp = timestamp
+
+                    #self.publish(self.score[cluster_name])
+                    self.publish(data)
 
 
     def compute_cluster_distance(self, version_data, cluster_data, cluster_name):
@@ -59,3 +67,9 @@ class CorrComparisonScore(BaseFlatliner):
         cluster_data = cluster_data.fillna(0)
 
         return version_data, cluster_data
+
+@dataclass
+class CORR_COMPARISON:
+    cluster: str = ""
+    corr_norm: float = 0.0
+    timestamp: float = 0.0

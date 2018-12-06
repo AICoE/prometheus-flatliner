@@ -8,6 +8,7 @@ rx = "*"
 pandas = "*"
 influxdb = "*"
 apscheduler = "*"
+dataclasses = "*"
 
 [dev-packages]
 pytest = "*"
