@@ -149,7 +149,7 @@ class Prometheus:
 
             start += chunk_size
 
-        return(json.dumps(data))
+        return((data))
 
     def get_current_metric_value(self, metric_name, label_config = None):
         data = []
@@ -207,4 +207,4 @@ class Prometheus:
                     response.content
                 ))
             start += chunk_seconds
-        return (json.dumps(data))
+        return ((data))

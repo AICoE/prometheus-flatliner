@@ -54,12 +54,12 @@ class PromMetricsLive:
         metric_data = dict()
         if observer:
             for metric in metrics_list:
-                pkt = (json.loads(prom.get_metric(name=metric))[0])
+                pkt = ((prom.get_metric(name=metric))[0])
                 metric_data[metric] = pkt
                 observer.on_next(pkt) # push metric data to the Observer
             pass
         else:
             for metric in metrics_list:
-                metric_data[metric] = (json.loads(prom.get_metric(name=metric))[0])
+                metric_data[metric] = ((prom.get_metric(name=metric))[0])
 
         return(metric_data)
