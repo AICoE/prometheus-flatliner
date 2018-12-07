@@ -4,12 +4,12 @@ import os
 
 
 def main():
-    metrics_list = os.getenv("FLT_METRICS_LIS")
+    metrics_list = os.getenv("FLT_METRICS_LIST")
     if metrics_list:    # If the env variable for FLT_METRICS_LIST is set, pull data from Prometheus
         metrics_list = str(metrics_list).split(",")
         print("The metrics initialized were: ",metrics_list)
-        metric_start_datetime = os.getenv("FLT_METRIC_START_DATETIME","14 Sept 2018")
-        metric_end_datetime = os.getenv("FLT_METRIC_END_DATETIME","15 Sept 2018")
+        metric_start_datetime = os.getenv("FLT_METRIC_START_DATETIME","17 Oct 2018")
+        metric_end_datetime = os.getenv("FLT_METRIC_END_DATETIME","18 Oct 2018")
         metric_chunk_size = os.getenv("FLT_METRIC_CHUNK_SIZE","1h")
 
         metrics_observable = metrics.PromMetrics(metrics_list=metrics_list,

@@ -8,12 +8,6 @@ from rx import Observable
 #Prometheus connection stuff
 from prometheus import Prometheus
 
-
-# Scheduling stuff
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.interval import IntervalTrigger
-import atexit
-
 class PromMetrics:
     def __init__(self, metrics_list, metric_start_datetime='1h', metric_end_datetime='now', metric_chunk_size='1h'):
         self.observable = Observable.create(self.push_metrics).publish()
