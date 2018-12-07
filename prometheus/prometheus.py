@@ -11,8 +11,6 @@ from retrying import retry
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-
-
 DEBUG = False
 MAX_REQUEST_RETRIES = 5
 CONNECTION_RETRY_WAIT_TIME = 5
@@ -86,7 +84,6 @@ class Prometheus:
         metrics = self.get_metrics_from_prom(name, num_chunks)
         if metrics:
             return metrics
-
 
     def get_metrics_from_prom(self, name, chunks):
         if name not in self.all_metrics():
