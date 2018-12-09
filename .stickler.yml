@@ -3,9 +3,11 @@ linters:
     python: 3
     max-line-length: 160
     fixer: true
+    ignore: 'E701'
   pep8:
     python: 3
     max-line-length: 160
     fixer: true
+    ignore: 'E701'
 fixers:
   enable: true

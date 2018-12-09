@@ -44,13 +44,13 @@ class CorrComparisonScore(BaseFlatliner):
                     timestamp = self.clusters[cluster_name]['timestamp']
                     self.score[cluster_name]["timestamp"] = timestamp
 
-                    data = CORR_COMPARISON()
-                    data.cluster = cluster_name
-                    data.corr_norm = self.score[cluster_name]['corr_norm']
-                    data.timestamp = timestamp
+                    state = self.State()
+                    state.cluster = cluster_name
+                    state.corr_norm = self.score[cluster_name]['corr_norm']
+                    state.timestamp = timestamp
 
                     #self.publish(self.score[cluster_name])
-                    self.publish(data)
+                    self.publish(state)
 
 
     def compute_cluster_distance(self, version_data, cluster_data, cluster_name):
@@ -68,8 +68,8 @@ class CorrComparisonScore(BaseFlatliner):
 
         return version_data, cluster_data
 
-@dataclass
-class CORR_COMPARISON:
-    cluster: str = ""
-    corr_norm: float = 0.0
-    timestamp: float = 0.0
+    @dataclass
+    class State:
+        cluster: str = ""
+        corr_norm: float = 0.0
+        timestamp: float = 0.0

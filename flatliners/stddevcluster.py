@@ -8,7 +8,6 @@ class StdDevCluster(BaseFlatliner):
         super().__init__()
 
         self.clusters = dict()
-        #self.data = STDEV_DATA()
 
     def on_next(self, x):
         """ update calculate std dev for cluster
@@ -39,9 +38,8 @@ class StdDevCluster(BaseFlatliner):
                                                                       cluster_id, version_id, previous)
 
         self.normalize_cluster(cluster_id, resource)
-        #self.clusters[cluster_id][resource]["timestamp"] = x["values"][0][0]
         self.clusters[cluster_id][resource].timestamp = x["values"][0][0]
-        #TODO: above grabes 1st timestamp from a series, fix by refactoring code to ingest only 1 entry at a time.
+        # TODO: above grabes 1st timestamp from a series, fix by refactoring code to ingest only 1 entry at a time.
         self.publish(self.clusters[cluster_id][resource])
 
 
@@ -91,22 +89,24 @@ class StdDevCluster(BaseFlatliner):
 
         return count, mean,total, std_dev, m2
 
+
     def calculate_stdv(self, values, name, cluster, version, previous = None):
         if previous:
             count, mean, total, std_dev, m2 = self.continue_calculation(values, previous)
         else:
             count, mean, total, std_dev, m2 = self.initilize_calculation(values)
 
-        data = STD_CLUSTER_DATA()
-        data.cluster = cluster
-        data.resource = name
-        data.std_dev = std_dev
-        data.m2 = m2
-        data.mean = mean
-        data.count = count
-        data.version = version
+        state = self.State()
+        state.cluster = cluster
+        state.resource = name
+        state.std_dev = std_dev
+        state.m2 = m2
+        state.mean = mean
+        state.count = count
+        state.version = version
 
-        return data
+        return state
+
 
     def normalize_cluster(self, cluster_id, resource):
         value = self.clusters[cluster_id][resource].std_dev
@@ -120,16 +120,19 @@ class StdDevCluster(BaseFlatliner):
         if max_value != min_value:
             self.clusters[cluster_id][resource].std_dev = (value - min_value)/(max_value - min_value)
 
-@dataclass
-class STD_CLUSTER_DATA:
 
-    cluster: str = ""
-    resource: str = ""
-    std_dev: float = 0.0
-    m2: float = 0.0
-    mean: float = 0.0
-    total:float = 0.0
-    count:float = 0.0
-    version:str = ""
-    timestamp: float = 0.0
+    @dataclass
+    class State:
+
+        cluster: str = ""
+        resource: str = ""
+        std_dev: float = 0.0
+        m2: float = 0.0
+        mean: float = 0.0
+        total: float = 0.0
+        count: float = 0.0
+        version: str = ""
+        timestamp: float = 0.0
+
+
 
