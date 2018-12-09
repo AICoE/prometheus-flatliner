@@ -90,7 +90,6 @@ class ClusterAlertCorrelation(BaseFlatliner):
                                                        'version': version_id,
                                                        'timestamp': tuple_timestamp}
 
-
             self.publish(self.clusters_correlation)
             #self.publish(cluster_id)
 

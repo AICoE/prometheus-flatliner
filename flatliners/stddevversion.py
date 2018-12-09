@@ -35,9 +35,9 @@ class StdDevVersion(BaseFlatliner):
         self.publish(self.versions[version_id][resource])
 
 
-    @staticmethod
-    def calculate_version_std(value, resource, version, previous = None):
-        #TODO: chnage from avg std to actual std for all availble resources in clusters with shared versions.
+
+    def calculate_version_std(self, value, resource, version, previous = None):
+        # TODO: chnage from avg std to actual std for all availble resources in clusters with shared versions.
         if previous:
             count = previous.count + 1
             total = previous.total + value
@@ -49,21 +49,21 @@ class StdDevVersion(BaseFlatliner):
             count = 1
             total = version_std_dev
 
-        data = STD_VERSION_DATA()
-        data.version = version
-        data.resource = resource
-        data.avg_std_dev = version_std_dev
-        data.count = count
-        data.total = total
+        state = self.State()
+        state.version = version
+        state.resource = resource
+        state.avg_std_dev = version_std_dev
+        state.count = count
+        state.total = total
 
-        return data
+        return state
 
 
-@dataclass
-class STD_VERSION_DATA:
+    @dataclass
+    class State:
 
-    resource: str = ""
-    avg_std_dev: float = 0.0
-    total:float = 0.0
-    count:float = 0.0
-    version:str = ""
+        resource: str = ""
+        avg_std_dev: float = 0.0
+        total:float = 0.0
+        count:float = 0.0
+        version:str = ""

@@ -14,13 +14,12 @@ class ComparisonScore(BaseFlatliner):
     def on_next(self, x):
         """ update l2 distance between cluster vector and baseline vector
         """
-
         # for version records, collect the average standard deviation value for
         # each resource
-        if isinstance(x, flatliners.stddevversion.STD_VERSION_DATA):
+        if isinstance(x, flatliners.stddevversion.StdDevVersion.State):
             self.set_version_std(x)
 
-        if isinstance(x, flatliners.stddevcluster.STD_CLUSTER_DATA):
+        if isinstance(x, flatliners.stddevcluster.StdDevCluster.State):
             cluster_id = x.cluster
             self.compute_cluster_distance(x)
             if self.ready_to_publish(x):
@@ -52,12 +51,12 @@ class ComparisonScore(BaseFlatliner):
         # store final, single value for each cluster in scores.
         self.clusters[cluster_id][resource] = (value - self.versions[version_id][resource])**2
 
-        data = STD_COMPARISON_DATA()
-        data.cluster = cluster_id
-        data.std_norm = (sum(list(self.clusters[cluster_id].values())))**0.5
-        data.timestamp = values.timestamp
+        state = self.State()
+        state.cluster = cluster_id
+        state.std_norm = (sum(list(self.clusters[cluster_id].values())))**0.5
+        state.timestamp = values.timestamp
 
-        self.score[cluster_id] = data
+        self.score[cluster_id] = state
 
 
     def ready_to_publish(self, x):
@@ -69,9 +68,9 @@ class ComparisonScore(BaseFlatliner):
           else:
               return False
 
-@dataclass
-class STD_COMPARISON_DATA:
+    @dataclass
+    class State:
 
-    cluster: str = ""
-    std_norm: float = 0.0
-    timestamp:float = 0.0
+        cluster: str = ""
+        std_norm: float = 0.0
+        timestamp:float = 0.0
