@@ -52,9 +52,8 @@ def main():
     score_sum = 0
     def add_scores(value):
         nonlocal score_sum
-        score_sum = score_sum + value['corr']
+        score_sum = score_sum + value.correlation
 
-    # weirdness_score.subscribe(lambda value: count = count + 1)
     weirdness_score.subscribe(add_scores)
 
     if "FLT_INFLUX_HOST" in os.environ:
