@@ -48,7 +48,7 @@ class StdDevCluster(BaseFlatliner):
         for x in values:
             current_value = int(x[1])
             current_count = previous.count + 1
-            current_total = previous.count + current_value
+            current_total = previous.total + current_value
             current_mean = current_total / current_count
 
             m2 = previous.m2 + abs((current_value - previous.mean) * (current_value - current_mean))
