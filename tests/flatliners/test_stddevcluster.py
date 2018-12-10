@@ -35,9 +35,12 @@ class TestStdDevCluster():
     def test_continue_calculation(self):
 
         sdc = StdDevCluster()
-
-        previous = {'count': 2, 'total': 10, 'mean': 5,
-                    'm2': 0, 'std_dev': 0}
+        previous = StdDevCluster.State()
+        previous.count = 2
+        previous.total = 10
+        previous.mean = 5
+        previous.m2 = 0
+        previous.std_dev = 0
 
         x = [[0, '0']]
 
