@@ -22,6 +22,7 @@ def main():
 
     # subscribe versioned metrics, which adds the version to the metrics stream
     # to metrics. Every metric emitted by metrics is sent to versioned_metrics
+
     versioned_metrics = flatliners.VersionedMetrics()  # initilizes an observer that operates on our data
     metrics_observable.subscribe(versioned_metrics)  # creates versioned_metrics that adds version to etcd data
 
@@ -40,7 +41,6 @@ def main():
 
     std_dev_cluster.subscribe(comparison_score)
     std_dev_version.subscribe(comparison_score)
-    # comparison_score.subscribe(print)
 
     # Alert correlation
     alert_cor = flatliners.ClusterAlertCorrelation()
@@ -51,6 +51,7 @@ def main():
     version_alert_corr = flatliners.GitVersionAlertCorrelation()
 
     versioned_metrics.subscribe(version_alert_corr)
+
     # version_alert_corr.subscribe(print) # this emits a df with correlation values for a gitVersion
 
     alert_cor.subscribe(corr_comparison_score)
