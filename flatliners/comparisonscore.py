@@ -1,5 +1,6 @@
 from .baseflatliner import BaseFlatliner
-
+import flatliners
+from dataclasses import dataclass
 
 class ComparisonScore(BaseFlatliner):
     def __init__(self):
@@ -13,17 +14,13 @@ class ComparisonScore(BaseFlatliner):
     def on_next(self, x):
         """ update l2 distance between cluster vector and baseline vector
         """
-        # determine if entry is a version metric or if it is a cluster metric
-        is_version_record = list(x.keys())[0] == 'version'
-        is_cluster_record = list(x.keys())[0] == 'cluster'
-
         # for version records, collect the average standard deviation value for
         # each resource
-        if is_version_record:
+        if isinstance(x, flatliners.stddevversion.StdDevVersion.State):
             self.set_version_std(x)
 
-        if is_cluster_record:
-            cluster_id = x['cluster']
+        if isinstance(x, flatliners.stddevcluster.StdDevCluster.State):
+            cluster_id = x.cluster
             self.compute_cluster_distance(x)
             if self.ready_to_publish(x):
                 self.publish(self.score[cluster_id])
@@ -31,20 +28,20 @@ class ComparisonScore(BaseFlatliner):
 
     def set_version_std(self, values):
         # select necessary values
-        resource = values['resource']
-        version_id = values['version']
+        resource = values.resource
+        version_id = values.version
         # add field for version_id if needed
         if version_id not in self.versions:
             self.versions[version_id] = dict()
         # set the value for the version_id and resource from the version record
-        self.versions[version_id][resource] = values['avg_std_dev']
+        self.versions[version_id][resource] = values.avg_std_dev
 
     def compute_cluster_distance(self, values):
         # select necessary values
-        cluster_id = values['cluster']
-        value = values['std_dev']
-        resource = values['resource']
-        version_id = values['version']
+        cluster_id = values.cluster
+        value = values.std_dev
+        resource = values.resource
+        version_id = values.version
         # add field for cluster_id if needed
         if cluster_id not in self.clusters:
             self.clusters[cluster_id] = dict()
@@ -53,16 +50,27 @@ class ComparisonScore(BaseFlatliner):
         # and then take the square root of the sum to calculate the Euclidean distance between vectors.
         # store final, single value for each cluster in scores.
         self.clusters[cluster_id][resource] = (value - self.versions[version_id][resource])**2
-        self.score[cluster_id] = {'cluster': cluster_id, 'std_norm': (sum(list(self.clusters[cluster_id].values())))**0.5,
-                                  "timestamp": values["timestamp"]}
+
+        state = self.State()
+        state.cluster = cluster_id
+        state.std_norm = (sum(list(self.clusters[cluster_id].values())))**0.5
+        state.timestamp = values.timestamp
+
+        self.score[cluster_id] = state
 
 
     def ready_to_publish(self, x):
-          cluster_id = x['cluster']
-          resoure_name = x['resource']
+          cluster_id = x.cluster
+          resoure_name = x.resource
         
           if resoure_name in self.clusters[cluster_id].keys():
               return True
           else:
               return False
 
+    @dataclass
+    class State:
+
+        cluster: str = ""
+        std_norm: float = 0.0
+        timestamp:float = 0.0

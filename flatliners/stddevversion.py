@@ -1,4 +1,5 @@
 from .baseflatliner import BaseFlatliner
+from dataclasses import dataclass
 
 
 class StdDevVersion(BaseFlatliner):
@@ -11,14 +12,10 @@ class StdDevVersion(BaseFlatliner):
         """ update std dev for version
         """
 
-        # stop if the metric name is not etcd_object_count
-        #if not self.metric_name(x) == 'etcd_object_counts':
-        #    return
-
         # grab the resource name and the version id
-        resource = x['resource']
-        version_id = x["version"]
-        value = x['std_dev']
+        resource = x.resource
+        version_id = x.version
+        value = x.std_dev
 
         # if version_id is not present add it as an empty dictionary
         if version_id not in self.versions:
@@ -38,11 +35,12 @@ class StdDevVersion(BaseFlatliner):
         self.publish(self.versions[version_id][resource])
 
 
-    @staticmethod
-    def calculate_version_std(value, resource, version, previous = None):
+
+    def calculate_version_std(self, value, resource, version, previous = None):
+        # TODO: chnage from avg std to actual std for all availble resources in clusters with shared versions.
         if previous:
-            count = previous['count'] + 1
-            total = previous['total'] + value
+            count = previous.count + 1
+            total = previous.total + value
             version_std_dev = total/count
 
         else:
@@ -51,4 +49,21 @@ class StdDevVersion(BaseFlatliner):
             count = 1
             total = version_std_dev
 
-        return {'version': version, 'resource': resource, 'avg_std_dev': version_std_dev, 'count': count, 'total':total}
+        state = self.State()
+        state.version = version
+        state.resource = resource
+        state.avg_std_dev = version_std_dev
+        state.count = count
+        state.total = total
+
+        return state
+
+
+    @dataclass
+    class State:
+
+        resource: str = ""
+        avg_std_dev: float = 0.0
+        total:float = 0.0
+        count:float = 0.0
+        version:str = ""

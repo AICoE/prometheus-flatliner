@@ -1,5 +1,6 @@
 from .baseflatliner import BaseFlatliner
 from statistics import stdev
+from dataclasses import dataclass
 
 
 class StdDevCluster(BaseFlatliner):
@@ -37,38 +38,28 @@ class StdDevCluster(BaseFlatliner):
                                                                       cluster_id, version_id, previous)
 
         self.normalize_cluster(cluster_id, resource)
-        self.clusters[cluster_id][resource]["timestamp"] = x["values"][0][0]
+        self.clusters[cluster_id][resource].timestamp = x["values"][0][0]
+        # TODO: above grabes 1st timestamp from a series, fix by refactoring code to ingest only 1 entry at a time.
         self.publish(self.clusters[cluster_id][resource])
 
-    @staticmethod
-    def calculate_mean(values, previous = None):
-        if previous:
-            count = len(values) + previous['count']
-            v_sum = previous['count'] * previous['mean']
-
-        else:
-            count = len(values)
-            v_sum = 0
-
-        v_sum += sum(int(x[1]) for x in values)
-        return {'count': count, 'mean': v_sum / count}
 
     @staticmethod
     def continue_calculation(values, previous):
         for x in values:
             current_value = int(x[1])
-            current_count = previous['count'] + 1
-            current_total = previous['total'] + current_value
+            current_count = previous.count + 1
+            current_total = previous.total + current_value
             current_mean = current_total / current_count
 
-            m2 = previous['m2'] + (current_value - previous['mean']) * (current_value - current_mean)
+            m2 = previous.m2 + abs((current_value - previous.mean) * (current_value - current_mean))
+            # added absolute value function to prevent std from being expressed as an imaginary number.
             std_dev = (m2 / (current_count - 1)) ** 0.5
 
-            previous['count'] = current_count
-            previous['total'] = current_total
-            previous['mean'] = current_mean
-            previous['m2'] = m2
-            previous['std_dev'] = std_dev
+            previous.count = current_count
+            previous.total = current_total
+            previous.mean = current_mean
+            previous.m2 = m2
+            previous.std_dev = std_dev
 
         count = current_count
         mean = current_mean
@@ -98,24 +89,50 @@ class StdDevCluster(BaseFlatliner):
 
         return count, mean,total, std_dev, m2
 
+
     def calculate_stdv(self, values, name, cluster, version, previous = None):
         if previous:
             count, mean, total, std_dev, m2 = self.continue_calculation(values, previous)
         else:
             count, mean, total, std_dev, m2 = self.initilize_calculation(values)
 
+        state = self.State()
+        state.cluster = cluster
+        state.resource = name
+        state.std_dev = std_dev
+        state.m2 = m2
+        state.mean = mean
+        state.count = count
+        state.version = version
 
-        return {'cluster': cluster, 'resource': name, 'std_dev': std_dev, 'm2': m2, 'mean': mean,
-                'total': total, 'count': count, 'version': version}
+        return state
+
 
     def normalize_cluster(self, cluster_id, resource):
-        value = self.clusters[cluster_id][resource]['std_dev']
+        value = self.clusters[cluster_id][resource].std_dev
         # get the othervalues:
         resource_names = list(self.clusters[cluster_id].keys())
         resource_list = []
         for i in resource_names:
-            resource_list.append(self.clusters[cluster_id][i]['std_dev'])
+            resource_list.append(self.clusters[cluster_id][i].std_dev)
         max_value = max(resource_list)
         min_value = min(resource_list)
         if max_value != min_value:
-            self.clusters[cluster_id][resource]['std_dev'] = (value - min_value)/(max_value - min_value)
+            self.clusters[cluster_id][resource].std_dev = (value - min_value)/(max_value - min_value)
+
+
+    @dataclass
+    class State:
+
+        cluster: str = ""
+        resource: str = ""
+        std_dev: float = 0.0
+        m2: float = 0.0
+        mean: float = 0.0
+        total: float = 0.0
+        count: float = 0.0
+        version: str = ""
+        timestamp: float = 0.0
+
+
+

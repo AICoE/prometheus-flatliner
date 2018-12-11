@@ -17,7 +17,10 @@ class InfluxdbStorage(BaseFlatliner):
 
         client.write_points([{"measurement": "clusterdata",
         "tags": {
-            "clusterID": x['cluster']
+            "clusterID": x.cluster
         },
-        "time": datetime.utcfromtimestamp(x['timestamp_std']).strftime('%Y-%m-%dT%H:%M:%SZ'),
-        "fields": x}])
+        "time": datetime.utcfromtimestamp(x.std_dev_timestamp).strftime('%Y-%m-%dT%H:%M:%SZ'),
+        "fields": {
+            "weirdness_score": x.weirdness_score
+
+        }}])

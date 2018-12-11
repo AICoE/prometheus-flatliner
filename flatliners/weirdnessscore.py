@@ -1,33 +1,49 @@
 from .baseflatliner import BaseFlatliner
+import flatliners
+
+from dataclasses import dataclass
 
 class WeirdnessScore(BaseFlatliner):
     def __init__(self):
         super().__init__()
 
         self.score = dict()
-        self.clusters = dict()
-        self.versions = dict()
 
     def on_next(self, x):
 
-        cluster_name = x['cluster']
+        cluster_name = x.cluster
 
         if cluster_name not in self.score:
-            self.score[cluster_name] = dict()
-            self.score[cluster_name]['cluster'] = cluster_name
+            self.score[cluster_name] = self.State()
+            self.score[cluster_name].cluster = cluster_name
 
-        if list(x.keys())[1] == 'corr_norm':
-            self.score[cluster_name]['corr'] = float(x['corr_norm'])
-            self.score[cluster_name]['timestamp_corr'] = float(x["timestamp"])
-
-
-        if list(x.keys())[1] == 'std_norm':
-            self.score[cluster_name]['std_dev'] = float(x['std_norm'])
-            self.score[cluster_name]['timestamp_std'] = float(x['timestamp'])
+        if isinstance(x, flatliners.corrcomparison.CorrComparisonScore.State):
+            self.score[cluster_name].correlation = float(x.corr_norm)
+            self.score[cluster_name].correlation_timestamp = float(x.timestamp)
+            self.score[cluster_name].corr_buffer = True
 
 
-        if len(list(self.score[cluster_name].keys()))>=5:
-            self.score[cluster_name]['sum'] = self.score[cluster_name]['corr'] \
-                                            + self.score[cluster_name]['std_dev']
+        if isinstance(x, flatliners.comparisonscore.ComparisonScore.State):
+            self.score[cluster_name].std_dev = float(x.std_norm)
+            self.score[cluster_name].std_dev_timestamp = float(x.timestamp)
+            self.score[cluster_name].std_dev_buffer = True
+
+
+        if self.score[cluster_name].corr_buffer and self.score[cluster_name].std_dev_buffer:
+            self.score[cluster_name].weirdness_score = self.score[cluster_name].correlation \
+                                            + self.score[cluster_name].std_dev
 
             self.publish(self.score[cluster_name])
+
+    @dataclass
+    class State:
+
+        cluster: str = ""
+        correlation: float = 0.0
+        correlation_timestamp: float = 0.0
+        std_dev: float = 0.0
+        std_dev_timestamp: float = 0.0
+        weirdness_score:float = 0.0
+        corr_buffer: bool = False
+        std_dev_buffer: bool = False
+
