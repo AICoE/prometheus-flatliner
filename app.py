@@ -4,7 +4,22 @@ import os
 
 
 def main():
-    metrics_observable = metrics.FileMetrics()  # this is an observable that streams in all the data alerts->etcd->build
+    metrics_list = os.getenv("FLT_METRICS_LIST")
+    if metrics_list:    # If the env variable for FLT_METRICS_LIST is set, pull data from Prometheus
+        metrics_list = str(metrics_list).split(",")
+        print("The metrics initialized were: ",metrics_list)
+        metric_start_datetime = os.getenv("FLT_METRIC_START_DATETIME","16 Oct 2018")
+        metric_end_datetime = os.getenv("FLT_METRIC_END_DATETIME","17 Oct 2018")
+        metric_chunk_size = os.getenv("FLT_METRIC_CHUNK_SIZE","6h")
+
+        metrics_observable = metrics.PromMetrics(metrics_list=metrics_list,
+                                    metric_start_datetime=metric_start_datetime,
+                                    metric_end_datetime=metric_end_datetime,
+                                    metric_chunk_size=metric_chunk_size) # this is an observable that streams in all the data alerts->etcd->build
+
+    else:                       # If FLT_METRICS_LIST is not set, use data from '/data/*'
+        metrics_observable = metrics.FileMetrics()  # this is an observable that streams in all the data alerts->etcd->build
+
     # subscribe versioned metrics, which adds the version to the metrics stream
     # to metrics. Every metric emitted by metrics is sent to versioned_metrics
     versioned_metrics = flatliners.VersionedMetrics()  # initilizes an observer that operates on our data
@@ -48,6 +63,8 @@ def main():
     comparison_score.subscribe(weirdness_score)
     corr_comparison_score.subscribe(weirdness_score)
 
+    # weirdness_score.subscribe(print)
+
     score_sum = 0
     def add_scores(value):
         nonlocal score_sum
@@ -63,7 +80,7 @@ def main():
     # connect the metrics stream to publish data
     metrics_observable.connect()
 
-    return score_sum
+    return score_sum # This score sum is different for different chunk sizes, we might wanna look into different metrics for this
 
 
 if __name__ == '__main__':

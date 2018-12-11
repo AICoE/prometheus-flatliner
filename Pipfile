@@ -8,6 +8,8 @@ rx = "*"
 pandas = "*"
 influxdb = "*"
 apscheduler = "*"
+dateparser = "*"
+retrying = "*"
 
 [dev-packages]
 pytest = "*"

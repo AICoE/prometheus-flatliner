@@ -1,20 +1,20 @@
 import json
 import os
 import sys
+import dateparser
 
 from rx import Observable
 
 #Prometheus connection stuff
 from prometheus import Prometheus
 
-# Scheduling stuff
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.interval import IntervalTrigger
-import atexit
-
 class PromMetrics:
-    def __init__(self):
+    def __init__(self, metrics_list, metric_start_datetime='1h', metric_end_datetime='now', metric_chunk_size='1h'):
         self.observable = Observable.create(self.push_metrics).publish()
+        self.metrics_list = metrics_list
+        self.metric_start_datetime = metric_start_datetime
+        self.metric_end_datetime = metric_end_datetime
+        self.metric_chunk_size = metric_chunk_size
 
     def subscribe(self, observer):
         self.observable.subscribe(observer)
@@ -23,43 +23,37 @@ class PromMetrics:
         self.observable.connect()
 
     def push_metrics(self, observer):
-        self._get_metrics_from_prometheus(observer) # Initial run for metric collection
+        self.observe_prom_metrics_range(observer=observer,
+                                        metrics_list=self.metrics_list,
+                                        start_time=self.metric_start_datetime,
+                                        end_time=self.metric_end_datetime,
+                                        chunk_size=self.metric_chunk_size)
 
-        # Scheduler schedules a background job that needs to be run regularly
-        scheduler = BackgroundScheduler()
-        scheduler.start()
-        scheduler.add_job(
-            func=lambda: self._get_metrics_from_prometheus(observer), # Run this function every 5 minutes to poll for new metric data
-            trigger=IntervalTrigger(minutes=5),
-            id='update_metric_data',
-            name='Ticker to get new data from prometheus',
-            replace_existing=True)
-
-        atexit.register(lambda: scheduler.shutdown()) # Shut down the scheduler when exiting the app
-
-    def _get_metrics_from_prometheus(self, observer=None):
+    def observe_prom_metrics_range(self, observer, metrics_list, start_time, end_time='now', chunk_size='1h'):
         # Collect credentials to connect to a prometheus instance
-        prom_token = os.getenv("PROM_ACCESS_TOKEN")
-        prom_url = os.getenv("PROM_URL")
+        prom_token = os.getenv("FLT_PROM_ACCESS_TOKEN")
+        prom_url = os.getenv("FLT_PROM_URL")
         if not (prom_token or prom_url):
             sys.exit("Error: Prometheus credentials not found")
+        prom = Prometheus(url=prom_url, token=prom_token)
 
+        # Calculate chunk size to download and push to the observer at each instance
+        chunk_seconds = int(round((dateparser.parse('now') - dateparser.parse(chunk_size)).total_seconds()))
+        print("\nCollecting metric data within datetime range:{0} - {1}".format(dateparser.parse(start_time),dateparser.parse(end_time)))
+        start = dateparser.parse(start_time).timestamp()
+        end = dateparser.parse(end_time).timestamp()
 
-        prom = Prometheus(url=prom_url, token=prom_token, data_chunk='5m',stored_data='5m')
+        while start < end:     # Main loop which iterates through time-ranges to collect a chunk of data at every iteration
+            for metric_name in metrics_list:    # Loop to get a chunk of data for every metric in the list
+                print("Current Chunk Info: Metric = {0}, Time range = {1} - {2}".format(metric_name, dateparser.parse(str(start)), dateparser.parse(str(start+chunk_seconds))))
+                pkt_list = (prom.get_metric_range_data(metric_name=metric_name, start_time=start, end_time=start+chunk_seconds))
 
-        metrics_list = prom.all_metrics() # Get a list of all the metrics available from Prometheus
-
-        print("Polling Prometheus for new metric data")
-
-        metric_data = dict()
-        if observer:
-            for metric in metrics_list:
-                pkt = (json.loads(prom.get_metric(name=metric))[0])
-                metric_data[metric] = pkt
-                observer.on_next(pkt) # push metric data to the Observer
-            pass
-        else:
-            for metric in metrics_list:
-                metric_data[metric] = (json.loads(prom.get_metric(name=metric))[0])
-
-        return(metric_data)
+                for pkt in pkt_list:        # pkt_list contains a list of data for multiple metrics, each of which is pushed to the observer.
+                    # print(dateparser.parse(str(pkt['values'][0][0])), "-", dateparser.parse(str(pkt['values'][-1][0])))
+                    try:
+                        observer.on_next(pkt)
+                    except Exception as e:
+                        print(pkt) # Check which pkt caused the exception
+                        raise(e)
+            start += chunk_seconds
+        pass
