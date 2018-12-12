@@ -66,7 +66,7 @@ def main():
 
     # weirdness_score.subscribe(print)
 
-    score_sum = []
+    score_sum = 0
     def add_scores(value):
         nonlocal score_sum
         score_sum = score_sum + value.correlation
