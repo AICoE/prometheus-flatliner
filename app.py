@@ -10,7 +10,7 @@ def main():
         print("The metrics initialized were: ",metrics_list)
         metric_start_datetime = os.getenv("FLT_METRIC_START_DATETIME","16 Oct 2018")
         metric_end_datetime = os.getenv("FLT_METRIC_END_DATETIME","17 Oct 2018")
-        metric_chunk_size = os.getenv("FLT_METRIC_CHUNK_SIZE","6h")
+        metric_chunk_size = os.getenv("FLT_METRIC_CHUNK_SIZE","1h")
 
         metrics_observable = metrics.PromMetrics(metrics_list=metrics_list,
                                     metric_start_datetime=metric_start_datetime,
@@ -65,10 +65,10 @@ def main():
 
     # weirdness_score.subscribe(print)
 
-    score_sum = 0
+    score_sum = []
     def add_scores(value):
         nonlocal score_sum
-        score_sum = score_sum + value['corr']
+        score_sum.append(value['corr'])
 
     # weirdness_score.subscribe(lambda value: count = count + 1)
     weirdness_score.subscribe(add_scores)
@@ -84,4 +84,5 @@ def main():
 
 
 if __name__ == '__main__':
-    print(main())
+    scores = (main())
+    print(sum(scores)/len(scores)) # We could take the mean of all the scores
