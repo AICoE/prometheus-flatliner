@@ -8,3 +8,4 @@ from .gitversionalertcorr import GitVersionAlertCorrelation
 from .corrcomparison import CorrComparisonScore
 from .weirdnessscore import WeirdnessScore
 from .influxdbstorage import InfluxdbStorage
+from .singlevaluemetric import SingleValueMetric
