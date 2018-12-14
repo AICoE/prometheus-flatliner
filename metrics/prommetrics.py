@@ -45,7 +45,9 @@ class PromMetrics:
 
         while start < end:     # Main loop which iterates through time-ranges to collect a chunk of data at every iteration
             for metric_name in metrics_list:    # Loop to get a chunk of data for every metric in the list
-                print("Current Chunk Info: Metric = {0}, Time range = {1} - {2}".format(metric_name, dateparser.parse(str(start)), dateparser.parse(str(start+chunk_seconds))))
+                print("Current Chunk Info: Metric = {0}, Time range = {1} - {2}".format(metric_name,
+                                                                                dateparser.parse(str(start)),
+                                                                                dateparser.parse(str(start+chunk_seconds))))
                 pkt_list = (prom.get_metric_range_data(metric_name=metric_name, start_time=start, end_time=start+chunk_seconds))
 
                 for pkt in pkt_list:        # pkt_list contains a list of data for multiple metrics, each of which is pushed to the observer.
