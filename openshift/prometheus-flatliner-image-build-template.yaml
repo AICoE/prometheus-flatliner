@@ -7,6 +7,7 @@ objects:
 - apiVersion: v1
   kind: ImageStream
   metadata:
+    namespace: ${NAMESPACE}
     name: ${APPLICATION_NAME}
     labels:
       app: ${APPLICATION_NAME}
@@ -21,6 +22,7 @@ objects:
 - apiVersion: v1
   kind: BuildConfig
   metadata:
+    namespace: ${NAMESPACE}
     name: ${APPLICATION_NAME}
     labels:
       app: ${APPLICATION_NAME}
@@ -56,11 +58,12 @@ objects:
     - type: ConfigChange
 
 parameters:
-- description: The name for job
-  from: 'prometheus-flatliner-image'
-  generate: expression
+- description: The name of the image
+  value: 'prometheus-flatliner'
   name: APPLICATION_NAME
   required: true
 - name: GIT_URI
-  value: https://github.com/AICOE/prometheus-flatliner.git
+  value: https://github.com/AICoE/prometheus-flatliner.git
+  required: true
+- name: NAMESPACE
   required: true
