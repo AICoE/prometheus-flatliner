@@ -1,18 +1,18 @@
 apiVersion: v1
 kind: Template
 metadata:
-  name: prometheus-flatliner-job-template
-
+  name: prometheus-flatliner-historic-job-template
 
 objects:
 - apiVersion: batch/v1
   kind: Job
   metadata:
+    namespace: ${NAMESPACE}
     name: ${APPLICATION_NAME}
     labels:
-      app: ${APPLICATION_NAME}
+      app: prometheus-flatliner-historic
   spec:
-    parallelism: 1
+    parallelism: 0
     completions: 1
     template:
       metadata:
@@ -20,7 +20,7 @@ objects:
       spec:
         containers:
         - name: ${APPLICATION_NAME}
-          image: ${BUILD_IMAGE}:latest
+          image: prometheus-flatliner:latest
           imagePullPolicy: Always
           resources:
             requests:
@@ -45,13 +45,12 @@ objects:
         restartPolicy: Never
 
 parameters:
+- name: NAMESPACE
+  required: true
 - description: The name for job
-  from: 'prometheus-flatliner-[a-z0-9]{4}'
+  from: 'prometheus-flatliner-historic-[a-z0-9]{4}'
   generate: expression
   name: APPLICATION_NAME
-  required: true
-- name: BUILD_IMAGE
-  description: Image that the job will use
   required: true
 - name: FLT_PROM_URL
   description: URL of prometheus server
