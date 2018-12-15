@@ -25,8 +25,3 @@ oc_historic_job:
 		--param FLT_METRIC_CHUNK_SIZE="${FLT_METRIC_CHUNK_SIZE}" \
 		| oc apply -f -
 
-oc_delete_job:
-	oc delete all -l app="${oc_app_name}"
-
-oc_delete_image:
-	oc delete all -l app="${oc_image_name}"

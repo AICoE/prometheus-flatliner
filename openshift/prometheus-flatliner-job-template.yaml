@@ -12,7 +12,7 @@ objects:
     labels:
       app: prometheus-flatliner-historic
   spec:
-    parallelism: 0
+    parallelism: 1
     completions: 1
     template:
       metadata:
