@@ -26,7 +26,7 @@ class BaseFlatliner(Observer):
 
     @staticmethod
     def metric_label(metric, name):
-        return metric['metric'][name]
+        return metric['metric'].get(name, None)
 
     @staticmethod
     def metric_values(x):
@@ -39,7 +39,7 @@ class BaseFlatliner(Observer):
         return self.metric_label(x, '_id')
 
     def cluster_version(self, x):
-        return self.metric_label(x, 'gitVersion')
+        return self.metric_label(x, 'version')
 
 
 

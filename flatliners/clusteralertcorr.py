@@ -32,7 +32,7 @@ class ClusterAlertCorrelation(BaseFlatliner):
 
         alert_name = self.metric_label(x, 'alertname')
         cluster_id = self.cluster_id(x)
-        version_id = self.metric_label(x, 'gitVersion')
+        version_id = self.cluster_version(x)
 
         if cluster_id not in self.clusters:
             self.clusters[cluster_id] = pd.DataFrame(columns=['_id', 'timestamp', 'alertname'])
