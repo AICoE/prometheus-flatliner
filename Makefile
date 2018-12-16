@@ -30,5 +30,11 @@ oc_historic_job:
 		--param FLT_METRIC_CHUNK_SIZE="${FLT_METRIC_CHUNK_SIZE}" \
 		| oc apply -f -
 
+run_app:
+	PIPENV_DOTENV_LOCATION=.env pipenv run python app.py
+
 historic_job:
-	pipenv run python app.py
+	PIPENV_DOTENV_LOCATION=.env.historic pipenv run pytest
+
+test:
+	PIPENV_DOTENV_LOCATION=.env.test pipenv run pytest
