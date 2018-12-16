@@ -26,7 +26,7 @@ class BaseFlatliner(Observer):
 
     @staticmethod
     def metric_label(metric, name):
-        return metric['metric'][name]
+        return metric['metric'].get(name, None)
 
     @staticmethod
     def metric_values(x):
