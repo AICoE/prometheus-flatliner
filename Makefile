@@ -11,6 +11,11 @@ oc_create_build:
 		--param NAMESPACE=${NAMESPACE} \
 		| oc apply -f -
 
+oc_build_head:
+	$(eval ARCHIVE=$(shell mktemp))
+	git archive --format=tar.gz HEAD > ${ARCHIVE}
+	oc start-build prometheus-flatliner --from-archive ${ARCHIVE} --follow
+
 oc_trigger_build:
 	oc start-build prometheus-flatliner -F
 
@@ -25,3 +30,5 @@ oc_historic_job:
 		--param FLT_METRIC_CHUNK_SIZE="${FLT_METRIC_CHUNK_SIZE}" \
 		| oc apply -f -
 
+historic_job:
+	pipenv run python app.py

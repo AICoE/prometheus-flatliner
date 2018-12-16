@@ -19,7 +19,7 @@ class StdDevCluster(BaseFlatliner):
         # grab the resource name and the cluster id
         resource = self.metric_label(x, 'resource')
         cluster_id = self.cluster_id(x)
-        version_id = self.metric_label(x,"gitVersion")
+        version_id = self.cluster_version(x)
 
         # if cluster_id is not present add it as an empty dictionary
         if cluster_id not in self.clusters:

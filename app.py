@@ -26,7 +26,6 @@ def main():
     versioned_metrics = flatliners.VersionedMetrics()  # initilizes an observer that operates on our data
     metrics_observable.subscribe(versioned_metrics)  # creates versioned_metrics that adds version to etcd data
 
-    # just 2 flatliners
     std_dev_cluster = flatliners.StdDevCluster()  # this is an observer that operates on some cluster data
     std_dev_version = flatliners.StdDevVersion()  # this is an observer that operates on some version data
     comparison_score = flatliners.ComparisonScore()
@@ -35,7 +34,6 @@ def main():
     single_value_metric = flatliners.SingleValueMetric()
     versioned_metrics.subscribe(single_value_metric)
 
-    # one will get versioned metrics
     # take etcd data and perform std_dev_cluster operation
     single_value_metric.subscribe(std_dev_cluster)
     std_dev_cluster.subscribe(std_dev_version)
@@ -69,8 +67,8 @@ def main():
 
     weirdness_score.subscribe(add_scores)
 
-    if "FLT_INFLUX_HOST" in os.environ:
-        influxdb_storage = flatliners.InfluxdbStorage()
+    if "FTL_INFLUX_DB_DSN" in os.environ:
+        influxdb_storage = flatliners.InfluxdbStorage(os.environ.get("FTL_INFLUX_DB_DSN"))
         weirdness_score.subscribe(influxdb_storage)
 
     # connect the metrics stream to publish data

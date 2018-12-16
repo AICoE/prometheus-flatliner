@@ -39,7 +39,7 @@ class BaseFlatliner(Observer):
         return self.metric_label(x, '_id')
 
     def cluster_version(self, x):
-        return self.metric_label(x, 'gitVersion')
+        return self.metric_label(x, 'version')
 
 
 
