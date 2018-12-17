@@ -1,7 +1,7 @@
 import flatliners
 import metrics
 import os
-
+from time import sleep
 
 def main():
     metrics_list = os.getenv("FLT_METRICS_LIST")
@@ -10,12 +10,18 @@ def main():
         print("The metrics initialized were: ",metrics_list)
         metric_start_datetime = os.getenv("FLT_METRIC_START_DATETIME","16 Oct 2018")
         metric_end_datetime = os.getenv("FLT_METRIC_END_DATETIME","17 Oct 2018")
-        metric_chunk_size = os.getenv("FLT_METRIC_CHUNK_SIZE","1h")
+        metric_chunk_size = os.getenv("FLT_METRIC_CHUNK_SIZE","15m")
 
-        metrics_observable = metrics.PromMetrics(metrics_list=metrics_list,
-                                    metric_start_datetime=metric_start_datetime,
-                                    metric_end_datetime=metric_end_datetime,
-                                    metric_chunk_size=metric_chunk_size) # this is an observable that streams in all the data alerts->etcd->build
+        if os.getenv("FLT_LIVE_METRIC_COLLECT","False") == "True":
+            print("Live Metrics Collection Mode")
+            metrics_observable = metrics.PromMetricsLive(metrics_list=metrics_list,
+                                                        metric_chunk_size=metric_chunk_size) # this is an observable that streams in all the data alerts->etcd->build
+            pass
+        else:
+            metrics_observable = metrics.PromMetricsLive(metrics_list=metrics_list,
+                                                        metric_start_datetime=metric_start_datetime,
+                                                        metric_end_datetime=metric_end_datetime,
+                                                        metric_chunk_size=metric_chunk_size) # this is an observable that streams in all the data alerts->etcd->build
 
     else:                       # If FLT_METRICS_LIST is not set, use data from '/data/*'
         metrics_observable = metrics.FileMetrics()  # this is an observable that streams in all the data alerts->etcd->build
@@ -73,6 +79,10 @@ def main():
 
     # connect the metrics stream to publish data
     metrics_observable.connect()
+
+    if os.getenv("FLT_LIVE_METRIC_COLLECT","False") == "True":
+        sleep(60*20) # Run live metric collection and analysis for 20 minutes
+
 
     return score_sum # This score sum is different for different chunk sizes, we might wanna look into different metrics for this
 
