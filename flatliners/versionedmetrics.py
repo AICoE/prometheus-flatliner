@@ -12,7 +12,7 @@ class VersionedMetrics(BaseFlatliner):
         self.buffer = dict()
 
     def on_next(self, x):
-        if self.metric_name(x) == 'openshift_build_info':
+        if self.metric_name(x) == 'cluster_version':
             self.update_cluster_versions(x)
             return
 
@@ -30,7 +30,7 @@ class VersionedMetrics(BaseFlatliner):
 
     def update_cluster_versions(self, x):
         cluster_id = self.cluster_id(x)
-        version = self.metric_label(x, 'gitVersion')
+        version = self.cluster_version(x)
         # TODO: make sure this is actually the latest timestamp
         # timestamp = self.metric_values(x)[-1][0]
         # let's just assume it's a newer timestamp
@@ -47,5 +47,5 @@ class VersionedMetrics(BaseFlatliner):
             del self.buffer[cluster_id]
 
     def add_version_and_publish(self, metric, version):
-        metric['metric']['gitVersion'] = version
+        metric['metric']['version'] = version
         self.publish(metric)

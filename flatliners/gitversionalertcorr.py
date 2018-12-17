@@ -37,7 +37,7 @@ class GitVersionAlertCorrelation(BaseFlatliner):
 
         if git_version not in self.gitVersions:
             self.gitVersions[git_version] = pd.DataFrame(\
-                columns=['_id', 'timestamp', 'alertname', 'gitVersion'])
+                columns=['_id', 'timestamp', 'alertname', 'version'])
 
         git_version_df = self.gitVersions[git_version]
 
@@ -51,7 +51,7 @@ class GitVersionAlertCorrelation(BaseFlatliner):
 
         git_version_df = git_version_df.append(
             pd.DataFrame({'_id': [cluster_id] * len(timestamps), 'timestamp': timestamps,
-                          'alertname': alerts, 'gitVersion': [git_version] * len(timestamps)}))
+                          'alertname': alerts, 'version': [git_version] * len(timestamps)}))
 
         git_version_df.reset_index(drop= True, inplace= True)
 
