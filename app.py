@@ -14,11 +14,11 @@ def main():
 
         if os.getenv("FLT_LIVE_METRIC_COLLECT","False") == "True":
             print("Live Metrics Collection Mode")
+            # metrics_observable is an observable that streams in all the data alerts->etcd->build
             metrics_observable = metrics.PromMetricsLive(metrics_list=metrics_list,
-                                                        metric_chunk_size=metric_chunk_size) # this is an observable that streams in all the data alerts->etcd->build
-            pass
+                                                        metric_chunk_size=metric_chunk_size)
         else:
-            metrics_observable = metrics.PromMetricsLive(metrics_list=metrics_list,
+            metrics_observable = metrics.PromMetrics(metrics_list=metrics_list,
                                                         metric_start_datetime=metric_start_datetime,
                                                         metric_end_datetime=metric_end_datetime,
                                                         metric_chunk_size=metric_chunk_size) # this is an observable that streams in all the data alerts->etcd->build
@@ -64,7 +64,7 @@ def main():
     comparison_score.subscribe(weirdness_score)
     corr_comparison_score.subscribe(weirdness_score)
 
-    weirdness_score.subscribe(print)
+    # weirdness_score.subscribe(print)
 
     score_sum = 0
     def add_scores(value):
@@ -81,8 +81,8 @@ def main():
     metrics_observable.connect()
 
     if os.getenv("FLT_LIVE_METRIC_COLLECT","False") == "True":
-        sleep(60*20) # Run live metric collection and analysis for 20 minutes
-
+        while True:
+            sleep(60) # This should be replaced by a flask app that serves weirdness_score as a metric
 
     return score_sum # This score sum is different for different chunk sizes, we might wanna look into different metrics for this
 
