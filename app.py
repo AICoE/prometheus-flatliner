@@ -35,7 +35,6 @@ def main():
     std_dev_cluster = flatliners.StdDevCluster()  # this is an observer that operates on some cluster data
     std_dev_version = flatliners.StdDevVersion()  # this is an observer that operates on some version data
     comparison_score = flatliners.ComparisonScore()
-    corr_comparison_score = flatliners.CorrComparisonScore()
 
     single_value_metric = flatliners.SingleValueMetric()
     versioned_metrics.subscribe(single_value_metric)
@@ -49,17 +48,6 @@ def main():
     std_dev_cluster.subscribe(comparison_score)
     std_dev_version.subscribe(comparison_score)
 
-    # Alert correlation
-    # alert_cor = flatliners.ClusterAlertCorrelation()
-    # single_value_metric.subscribe(alert_cor)
-
-    # Git version alert correlation
-    version_alert_corr = flatliners.GitVersionAlertCorrelation()
-    single_value_metric.subscribe(version_alert_corr)
-
-    # alert_cor.subscribe(corr_comparison_score)
-    version_alert_corr.subscribe(corr_comparison_score)
-
     weirdness_score = flatliners.WeirdnessScore()
     comparison_score.subscribe(weirdness_score)
     corr_comparison_score.subscribe(weirdness_score)
@@ -69,11 +57,11 @@ def main():
     score_sum = 0
     def add_scores(value):
         nonlocal score_sum
-        score_sum = score_sum + value.correlation
+        score_sum = score_sum + value.std_dev
 
     weirdness_score.subscribe(add_scores)
 
-    if "FTL_INFLUX_DB_DSN" in os.environ:
+    if os.getenv("FTL_INFLUX_DB_DSN"):
         influxdb_storage = flatliners.InfluxdbStorage(os.environ.get("FTL_INFLUX_DB_DSN"))
         weirdness_score.subscribe(influxdb_storage)
 
