@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Template
 metadata:
-  name: prometheus-flatliner-historic-job-template
+  name: prometheus-flatliner-job-template
 
 objects:
 - apiVersion: batch/v1
@@ -10,7 +10,7 @@ objects:
     namespace: ${NAMESPACE}
     name: ${APPLICATION_NAME}
     labels:
-      app: prometheus-flatliner-historic
+      app: prometheus-flatliner-app
   spec:
     parallelism: 1
     completions: 1
@@ -40,8 +40,10 @@ objects:
             value: "${FLT_METRIC_END_DATETIME}"
           - name: FLT_METRIC_CHUNK_SIZE
             value: "${FLT_METRIC_CHUNK_SIZE}"
-          # - name: FLT_INFLUX_HOST
-          #   value: "${FLT_INFLUX_HOST}"
+          - name: FLT_LIVE_METRIC_COLLECT
+            value: "${FLT_LIVE_METRIC_COLLECT}"
+          - name: FLT_INFLUX_DB_DSN
+            value: "${FLT_INFLUX_DB_DSN}"
         restartPolicy: Never
 
 parameters:
@@ -70,6 +72,9 @@ parameters:
 - name: FLT_METRIC_CHUNK_SIZE
   description: Size of chunks of metrics collected from prometheus at an instance
   required: true
-- name: FLT_INFLUX_HOST
+- name: FLT_LIVE_METRIC_COLLECT
+  description: If set to True, this will enable the live metric collecting mode
+  required: true
+- name: FLT_INFLUX_DB_DSN
   description: The URL to connect to an influx database
-  required: false
+  required: True

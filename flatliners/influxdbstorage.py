@@ -10,7 +10,7 @@ class InfluxdbStorage(BaseFlatliner):
         self.influx_dsn = influx_dsn
         self.client = InfluxDBClient.from_dsn(self.influx_dsn, timeout=5)
         self.buffer_list = []
-        self.buffer_size = 50000
+        self.buffer_size = 500
 
     def on_next(self, x):
         """ update l2 distance between cluster vector and baseline vector
@@ -31,6 +31,6 @@ class InfluxdbStorage(BaseFlatliner):
             self.flush_buffer()
 
     def flush_buffer(self):
-        print("Flushing Buffer")
+        # print("Flushing Buffer Data to the DB")
         self.client.write_points(self.buffer_list)
         self.buffer_list = []
