@@ -73,8 +73,8 @@ def main():
 
     weirdness_score.subscribe(add_scores)
 
-    if os.getenv("FTL_INFLUX_DB_DSN"):
-        influxdb_storage = flatliners.InfluxdbStorage(os.environ.get("FTL_INFLUX_DB_DSN"))
+    if os.getenv("FLT_INFLUX_DB_DSN"):
+        influxdb_storage = flatliners.InfluxdbStorage(os.environ.get("FLT_INFLUX_DB_DSN"))
         weirdness_score.subscribe(influxdb_storage)
 
     # connect the metrics stream to publish data
