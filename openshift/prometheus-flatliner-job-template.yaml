@@ -45,6 +45,8 @@ objects:
             value: "${FLT_LIVE_METRIC_COLLECT}"
           - name: FLT_INFLUX_DB_DSN
             value: "${FLT_INFLUX_DB_DSN}"
+          - name: FLT_DEBUG_MODE
+            value: "${FLT_DEBUG_MODE}"
         restartPolicy: Never
 
 parameters:
@@ -78,4 +80,8 @@ parameters:
   required: true
 - name: FLT_INFLUX_DB_DSN
   description: The URL to connect to an influx database
-  required: True
+  required: true
+- name: FLT_DEBUG_MODE
+  description: Enable verbose log for debugging
+  value: 'False'
+  required: false

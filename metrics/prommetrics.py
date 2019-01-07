@@ -11,8 +11,7 @@ from prometheus import Prometheus
 
 # Set up logging
 _LOGGER = logging.getLogger(__name__)
-# Log record format
-logging.basicConfig(format='%(asctime)s:%(levelname)s: %(message)s', level=logging.INFO)
+
 
 class PromMetrics:
     def __init__(self, metrics_list, metric_start_datetime='1h', metric_end_datetime='now', metric_chunk_size='1h'):
