@@ -33,11 +33,11 @@ oc_historic_job:
 		| oc apply -f -
 
 oc_delete_historic_job:
-	oc delete all -l app=prometheus-flatliner-historic-job
+	oc delete all -l job_batch=prometheus-flatliner-historic-job
 
 oc_live_job:
 	oc process --filename=openshift/prometheus-flatliner-job-template.yaml \
-		--param APPLICATION_NAME="prometheus-flatliner-live-job"
+		--param APPLICATION_NAME="prometheus-flatliner-live-job" \
 		--param NAMESPACE=${NAMESPACE} \
 		--param FLT_PROM_URL=${FLT_PROM_URL} \
 		--param FLT_PROM_ACCESS_TOKEN="${FLT_PROM_ACCESS_TOKEN}" \
@@ -50,7 +50,7 @@ oc_live_job:
 		| oc apply -f -
 
 oc_delete_live_job:
-	oc delete all -l app=prometheus-flatliner-live-job
+	oc delete all -l job_batch=prometheus-flatliner-live-job
 
 run_app:
 	PIPENV_DOTENV_LOCATION=.env pipenv run python app.py

@@ -31,6 +31,6 @@ class InfluxdbStorage(BaseFlatliner):
             self.flush_buffer()
 
     def flush_buffer(self):
-        # print("Flushing Buffer Data to the DB")
+        print("Flushing Buffer Data to the DB") # Keep this for debugging, change to a log entry later
         self.client.write_points(self.buffer_list)
         self.buffer_list = []

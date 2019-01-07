@@ -11,6 +11,7 @@ objects:
     name: ${APPLICATION_NAME}
     labels:
       app: prometheus-flatliner-app
+      job_batch: ${APPLICATION_NAME}
   spec:
     parallelism: 1
     completions: 1
