@@ -1,0 +1,163 @@
+apiVersion: v1
+kind: Template
+
+labels:
+  application: ${APPLICATION_NAME}
+
+metadata:
+  name: prometheus-flatliner-live-deployment-template
+
+parameters:
+- name: NAMESPACE
+  required: true
+- description: The name for job
+  from: 'prometheus-flatliner-historic-[a-z0-9]{4}'
+  generate: expression
+  name: APPLICATION_NAME
+  required: true
+- name: GIT_URI
+  value: https://github.com/4n4nd/prometheus-flatliner.git
+  required: true
+- name: FLT_PROM_URL
+  description: URL of prometheus server
+  required: true
+- name: FLT_PROM_ACCESS_TOKEN
+  description: Bearer Token for accessing prometheus
+  required: true
+- name: FLT_METRICS_LIST
+  description: List of metrics to be collected from Prometheus
+  required: true
+- name: FLT_METRIC_START_DATETIME
+  description: Metric data timeframe - Start Time
+  required: true
+- name: FLT_METRIC_END_DATETIME
+  description: Metric data timeframe - End Time
+  required: true
+- name: FLT_METRIC_CHUNK_SIZE
+  description: Size of chunks of metrics collected from prometheus at an instance
+  required: true
+- name: FLT_LIVE_METRIC_COLLECT
+  description: If set to True, this will enable the live metric collecting mode
+  required: true
+- name: FLT_INFLUX_DB_DSN
+  description: The URL to connect to an influx database
+  required: true
+- name: FLT_DEBUG_MODE
+  description: Enable verbose log for debugging
+  value: 'False'
+  required: false
+
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: ${APPLICATION_NAME}
+    labels:
+      app: ${APPLICATION_NAME}
+  spec:
+    dockerImageRepository: ${APPLICATION_NAME}
+    tags:
+    - name: latest
+    lookupPolicy:
+      local: true
+
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: ${APPLICATION_NAME}
+    labels:
+      app: ${APPLICATION_NAME}
+  spec:
+    resources:
+      limits:
+        memory: 2Gi
+        cpu: "1"
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${APPLICATION_NAME}:latest
+    source:
+      git:
+        uri: ${GIT_URI}
+      type: Git
+    strategy:
+      type: Source
+      sourceStrategy:
+        env:
+        - name: APP_FILE
+          value: 'app.py'
+        - name: GIT_SSL_NO_VERIFY
+          value: 'true'
+        - name: ENABLE_PIPENV
+          value: '1'
+        forcePull: true
+        from:
+          kind: DockerImage
+          name: 'docker.io/centos/python-36-centos7:latest'
+    triggers:
+    - imageChange: {}
+      type: ImageChange
+    - type: ConfigChange
+
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    name: ${APPLICATION_NAME}
+    labels:
+      deploymentConfig: ${APPLICATION_NAME}
+      app: ${APPLICATION_NAME}
+  spec:
+    replicas: 1
+    selector:
+      deploymentConfig: ${APPLICATION_NAME}
+    strategy:
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          deploymentConfig: ${APPLICATION_NAME}
+          app: ${APPLICATION_NAME}
+      spec:
+        containers:
+        - env:
+          - name: FLT_PROM_URL
+            value: "${FLT_PROM_URL}"
+          - name: FLT_PROM_ACCESS_TOKEN
+            value: "${FLT_PROM_ACCESS_TOKEN}"
+          - name: FLT_METRICS_LIST
+            value: "${FLT_METRICS_LIST}"
+          - name: FLT_METRIC_START_DATETIME
+            value: "${FLT_METRIC_START_DATETIME}"
+          - name: FLT_METRIC_END_DATETIME
+            value: "${FLT_METRIC_END_DATETIME}"
+          - name: FLT_METRIC_CHUNK_SIZE
+            value: "${FLT_METRIC_CHUNK_SIZE}"
+          - name: FLT_LIVE_METRIC_COLLECT
+            value: "${FLT_LIVE_METRIC_COLLECT}"
+          - name: FLT_INFLUX_DB_DSN
+            value: "${FLT_INFLUX_DB_DSN}"
+          - name: FLT_DEBUG_MODE
+            value: "${FLT_DEBUG_MODE}"
+          image: ${APPLICATION_NAME}
+          imagePullPolicy: IfNotPresent
+          name: ${APPLICATION_NAME}
+          resources:
+            requests:
+              memory: 500Mi
+              cpu: "1"
+            limits:
+              memory: 1Gi
+              cpu: "2"
+          terminationMessagePath: /dev/termination-log
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - ${APPLICATION_NAME}
+        from:
+          kind: ImageStreamTag
+          name: ${APPLICATION_NAME}:latest
+      type: ImageChange
+    - type: ConfigChange
