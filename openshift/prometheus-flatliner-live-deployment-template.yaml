@@ -16,7 +16,7 @@ parameters:
   name: APPLICATION_NAME
   required: true
 - name: GIT_URI
-  value: https://github.com/4n4nd/prometheus-flatliner.git
+  value: https://github.com/AICoE/prometheus-flatliner.git
   required: true
 - name: FLT_PROM_URL
   description: URL of prometheus server

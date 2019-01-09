@@ -29,6 +29,7 @@ oc_historic_job:
 		--param FLT_METRIC_START_DATETIME="${FLT_METRIC_START_DATETIME}" \
 		--param FLT_METRIC_END_DATETIME="${FLT_METRIC_END_DATETIME}" \
 		--param FLT_METRIC_CHUNK_SIZE="${FLT_METRIC_CHUNK_SIZE}" \
+		--param FLT_INFLUX_DB_DSN="${FLT_INFLUX_DB_DSN}" \
 		| oc apply -f -
 
 oc_delete_historic_job:
