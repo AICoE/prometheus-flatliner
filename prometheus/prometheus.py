@@ -173,7 +173,7 @@ class Prometheus:
 
         if not chunk_size:
             chunk_seconds = int(end - start)
-            chunk_size = str(int(chunk_seconds/60)) + "m"
+            chunk_size = str(int(chunk_seconds)) + "s"
         else:
             chunk_seconds = int(round((dateparser.parse('now') - dateparser.parse(chunk_size)).total_seconds()))
 
