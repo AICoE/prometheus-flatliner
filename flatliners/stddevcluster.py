@@ -39,7 +39,6 @@ class StdDevCluster(BaseFlatliner):
 
         self.normalize_cluster(cluster_id, resource)
         self.clusters[cluster_id][resource].timestamp = x["values"][0][0]
-        # TODO: above grabes 1st timestamp from a series, fix by refactoring code to ingest only 1 entry at a time.
         self.publish(self.clusters[cluster_id][resource])
 
 
@@ -109,16 +108,26 @@ class StdDevCluster(BaseFlatliner):
 
 
     def normalize_cluster(self, cluster_id, resource):
-        value = self.clusters[cluster_id][resource].std_dev
-        # get the othervalues:
+        # get the values:
         resource_names = list(self.clusters[cluster_id].keys())
+        resource_vector_length = len(resource_names)
         resource_list = []
+
+        if resource_vector_length == 1:
+            self.clusters[cluster_id][resource].std_dev = 0.0
+            return
+
         for i in resource_names:
             resource_list.append(self.clusters[cluster_id][i].std_dev)
         max_value = max(resource_list)
         min_value = min(resource_list)
-        if max_value != min_value:
-            self.clusters[cluster_id][resource].std_dev = (value - min_value)/(max_value - min_value)
+
+        for value, name in zip(resource_list, resource_names):
+            if max_value != min_value:
+                self.clusters[cluster_id][name].std_dev = ((value - min_value)/(max_value - min_value))\
+                                                          / resource_vector_length
+            else:
+                self.clusters[cluster_id][name].std_dev = 0.0
 
 
     @dataclass
