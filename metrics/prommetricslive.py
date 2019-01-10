@@ -18,11 +18,12 @@ class PromMetricsLive:
     def __init__(self, metrics_list, metric_chunk_size='1h'):
         self.observable = Observable.create(self.push_metrics).publish()
         self.metrics_list = metrics_list
-        self.metric_start_datetime = metric_chunk_size
-        self.metric_end_datetime = 'now'
+        self.metric_end_datetime = os.getenv('FLT_LIVE_METRIC_DELAY','now')
         self.metric_chunk_size = metric_chunk_size
         self.trigger_interval_secs = int(round((dateparser.parse('now') - dateparser.parse(self.metric_chunk_size)).total_seconds()))
-
+        self.metric_start_datetime = str(self.trigger_interval_secs + int(round((dateparser.parse('now') - dateparser.parse(self.metric_end_datetime)).total_seconds()))) + 's' #'3m' # should be (metric_chunk_size + metric_end_datetime)
+        self.prev_pkt_end_time = self.metric_start_datetime
+        
     def subscribe(self, observer):
         self.observable.subscribe(observer)
 
@@ -46,13 +47,13 @@ class PromMetricsLive:
     def _get_metrics_from_prometheus(self, observer):
         # Use the existing PromMetrics Class to push metrics to the observer
         Prom = PromMetrics(metrics_list=self.metrics_list,
-                    metric_start_datetime=str(self.metric_start_datetime),
+                    metric_start_datetime=str(self.prev_pkt_end_time),
                     metric_end_datetime=self.metric_end_datetime,
-                    metric_chunk_size=str(self.metric_start_datetime))
+                    metric_chunk_size=str(self.metric_chunk_size))
         Prom.push_metrics(observer=observer)
 
-        self.metric_start_datetime = int(max(Prom.final_packet_timestamp.values()))
         # The next metric_start_datetime is the latest timestamp of the previously collected metric
-        if self.metric_start_datetime == 0 or self.metric_start_datetime > (2*self.trigger_interval_secs) :
-            self.metric_start_datetime = self.metric_chunk_size
-        # print("Next timestamp is {0}, {1}".format(self.metric_start_datetime, dateparser.parse(str(self.metric_start_datetime))))
+        self.prev_pkt_end_time = int(max(Prom.final_packet_timestamp.values()))
+        current_timestamp_diff = (dateparser.parse('now') - dateparser.parse(str(self.prev_pkt_end_time))).total_seconds()
+        if current_timestamp_diff > (2*(self.trigger_interval_secs)):
+            self.prev_pkt_end_time = self.metric_start_datetime

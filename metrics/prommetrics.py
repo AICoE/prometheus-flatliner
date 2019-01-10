@@ -21,6 +21,7 @@ class PromMetrics:
         self.metric_end_datetime = metric_end_datetime
         self.metric_chunk_size = metric_chunk_size
         self.final_packet_timestamp = dict()
+        self.final_packet_timestamp[0] = 0
 
     def subscribe(self, observer):
         self.observable.subscribe(observer)
