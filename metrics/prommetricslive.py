@@ -21,9 +21,9 @@ class PromMetricsLive:
         self.metric_end_datetime = os.getenv('FLT_LIVE_METRIC_DELAY','now')
         self.metric_chunk_size = metric_chunk_size
         self.trigger_interval_secs = int(round((dateparser.parse('now') - dateparser.parse(self.metric_chunk_size)).total_seconds()))
-        self.metric_start_datetime = str(self.trigger_interval_secs + int(round((dateparser.parse('now') - dateparser.parse(self.metric_end_datetime)).total_seconds()))) + 's' #'3m' # should be (metric_chunk_size + metric_end_datetime)
+        self.metric_start_datetime = str(self.trigger_interval_secs + int(round((dateparser.parse('now') - dateparser.parse(self.metric_end_datetime)).total_seconds()))) + 's' 
         self.prev_pkt_end_time = self.metric_start_datetime
-        
+
     def subscribe(self, observer):
         self.observable.subscribe(observer)
 

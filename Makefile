@@ -47,6 +47,7 @@ oc_live_deploy:
 		--param FLT_METRIC_CHUNK_SIZE="${FLT_METRIC_CHUNK_SIZE}" \
 		--param FLT_INFLUX_DB_DSN="${FLT_INFLUX_DB_DSN}" \
 		--param FLT_LIVE_METRIC_COLLECT="True" \
+		--param FLT_LIVE_METRIC_DELAY="${FLT_LIVE_METRIC_DELAY}" \
 		| oc apply -f -
 
 oc_delete_live_deployment:
