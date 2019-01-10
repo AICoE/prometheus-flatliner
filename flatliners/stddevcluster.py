@@ -125,7 +125,7 @@ class StdDevCluster(BaseFlatliner):
         for value, name in zip(resource_list, resource_names):
             if max_value != min_value:
                 self.clusters[cluster_id][name].std_dev = ((value - min_value)/(max_value - min_value))\
-                                                          / resource_vector_length
+                                                          / (resource_vector_length)**(0.5)
             else:
                 self.clusters[cluster_id][name].std_dev = 0.0
 

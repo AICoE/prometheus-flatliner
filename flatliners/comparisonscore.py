@@ -53,6 +53,7 @@ class ComparisonScore(BaseFlatliner):
 
         state = self.State()
         state.cluster = cluster_id
+        state.version = values.version
         state.std_norm = (sum(list(self.clusters[cluster_id].values())))**0.5
         state.timestamp = values.timestamp
 
@@ -72,5 +73,6 @@ class ComparisonScore(BaseFlatliner):
     class State:
 
         cluster: str = ""
+        version: str = ""
         std_norm: float = 0.0
         timestamp:float = 0.0
