@@ -1,7 +1,11 @@
 from datetime import datetime
 from influxdb import InfluxDBClient
+import logging
 
 from .baseflatliner import BaseFlatliner
+
+# Set up logging
+_LOGGER = logging.getLogger(__name__)
 
 
 class InfluxdbStorage(BaseFlatliner):
@@ -10,7 +14,8 @@ class InfluxdbStorage(BaseFlatliner):
         self.influx_dsn = influx_dsn
         self.client = InfluxDBClient.from_dsn(self.influx_dsn, timeout=5)
         self.buffer_list = []
-        self.buffer_size = 50000
+        self.buffer_size = 5000
+        _LOGGER.info("InfluxDB connection initialized.")
 
     def on_next(self, x):
         """ update l2 distance between cluster vector and baseline vector
@@ -32,6 +37,6 @@ class InfluxdbStorage(BaseFlatliner):
             self.flush_buffer()
 
     def flush_buffer(self):
-        print("Flushing Buffer")
+        _LOGGER.debug("Flushing Influx buffer data to the DB, buffer size:{0}".format(len(self.buffer_list)))
         self.client.write_points(self.buffer_list)
         self.buffer_list = []

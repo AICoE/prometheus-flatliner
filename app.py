@@ -2,18 +2,30 @@ import flatliners
 import metrics
 import os
 from time import sleep
+import logging
+
+# Set up logging
+_LOGGER = logging.getLogger(__name__)
+
+if os.getenv("FLT_DEBUG_MODE","False") == "True":
+    logging_level = logging.DEBUG # Enable Debug mode
+else:
+    logging_level = logging.INFO
+
+# Log record format
+logging.basicConfig(format='%(asctime)s:%(levelname)s: %(message)s', level=logging_level)
 
 def main():
     metrics_list = os.getenv("FLT_METRICS_LIST")
     if metrics_list:    # If the env variable for FLT_METRICS_LIST is set, pull data from Prometheus
         metrics_list = str(metrics_list).split(",")
-        print("The metrics initialized were: ",metrics_list)
+        _LOGGER.info("The metrics initialized were: {0}".format(metrics_list))
         metric_start_datetime = os.getenv("FLT_METRIC_START_DATETIME","16 Oct 2018")
         metric_end_datetime = os.getenv("FLT_METRIC_END_DATETIME","17 Oct 2018")
         metric_chunk_size = os.getenv("FLT_METRIC_CHUNK_SIZE","15m")
 
         if os.getenv("FLT_LIVE_METRIC_COLLECT","False") == "True":
-            print("Live Metrics Collection Mode")
+            _LOGGER.info("Starting Live Metrics Collection Mode")
             # metrics_observable is an observable that streams in all the data alerts->etcd->build
             metrics_observable = metrics.PromMetricsLive(metrics_list=metrics_list,
                                                         metric_chunk_size=metric_chunk_size)
@@ -60,8 +72,8 @@ def main():
 
     weirdness_score.subscribe(add_scores)
 
-    if os.getenv("FTL_INFLUX_DB_DSN"):
-        influxdb_storage = flatliners.InfluxdbStorage(os.environ.get("FTL_INFLUX_DB_DSN"))
+    if os.getenv("FLT_INFLUX_DB_DSN"):
+        influxdb_storage = flatliners.InfluxdbStorage(os.environ.get("FLT_INFLUX_DB_DSN"))
         weirdness_score.subscribe(influxdb_storage)
 
     # connect the metrics stream to publish data
