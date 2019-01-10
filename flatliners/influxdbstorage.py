@@ -23,7 +23,8 @@ class InfluxdbStorage(BaseFlatliner):
         self.buffer_list.append({
             "measurement": "clusterdata",
             "tags": {
-                "clusterID": x.cluster
+                "clusterID": x.cluster,
+                "clusterVersion": x.version
             },
             "time": datetime.utcfromtimestamp(x.std_dev_timestamp).strftime('%Y-%m-%dT%H:%M:%SZ'),
             "fields": {
