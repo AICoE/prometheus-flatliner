@@ -43,8 +43,9 @@ parameters:
   description: The URL to connect to an influx database
   required: true
 - name: FLT_LIVE_METRIC_DELAY
-  description: The URL to connect to an influx database
-  required: true
+  description: The rolling delay while collecting live metrics (now = no delay, 5m = 5 minutes of delay) 
+  value: 'now'
+  required: false
 - name: FLT_DEBUG_MODE
   description: Enable verbose log for debugging
   value: 'False'
