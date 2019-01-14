@@ -23,6 +23,7 @@ class WeirdnessScore(BaseFlatliner):
             self.score[cluster_name].std_dev_timestamp = float(x.timestamp)
             self.score[cluster_name].std_dev_buffer = True
             self.score[cluster_name].version = version
+            self.score[cluster_name].resource_deltas = x.resource_deltas
 
         if self.score[cluster_name].std_dev_buffer:
             self.score[cluster_name].weirdness_score = self.score[cluster_name].std_dev
@@ -37,4 +38,5 @@ class WeirdnessScore(BaseFlatliner):
         std_dev_timestamp: float = 0.0
         weirdness_score:float = 0.0
         std_dev_buffer: bool = False
+        resource_deltas: str = ""
 

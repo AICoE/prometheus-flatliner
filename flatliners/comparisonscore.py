@@ -9,6 +9,7 @@ class ComparisonScore(BaseFlatliner):
         self.score = dict()
         self.clusters = dict()
         self.versions = dict()
+        self.resource_deltas = dict()
 
 
     def on_next(self, x):
@@ -51,14 +52,19 @@ class ComparisonScore(BaseFlatliner):
         # store final, single value for each cluster in scores.
         self.clusters[cluster_id][resource] = (value - self.versions[version_id][resource])**2
 
+        if cluster_id not in self.resource_deltas:
+            self.resource_deltas[cluster_id] = dict()
+        self.resource_deltas[cluster_id][resource] = abs(self.clusters[cluster_id][resource]-
+                             self.versions[version_id][resource])
+
         state = self.State()
         state.cluster = cluster_id
         state.version = values.version
         state.std_norm = (sum(list(self.clusters[cluster_id].values())))**0.5
         state.timestamp = values.timestamp
+        state.resource_deltas = self.resource_deltas[cluster_id]
 
         self.score[cluster_id] = state
-
 
     def ready_to_publish(self, x):
           cluster_id = x.cluster
@@ -76,3 +82,4 @@ class ComparisonScore(BaseFlatliner):
         version: str = ""
         std_norm: float = 0.0
         timestamp:float = 0.0
+        resource_deltas: str = ""
