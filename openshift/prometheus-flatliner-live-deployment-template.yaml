@@ -42,6 +42,10 @@ parameters:
 - name: FLT_INFLUX_DB_DSN
   description: The URL to connect to an influx database
   required: true
+- name: FLT_LIVE_METRIC_DELAY
+  description: The rolling delay while collecting live metrics (now = no delay, 5m = 5 minutes of delay) 
+  value: 'now'
+  required: false
 - name: FLT_DEBUG_MODE
   description: Enable verbose log for debugging
   value: 'False'
@@ -136,6 +140,8 @@ objects:
             value: "${FLT_LIVE_METRIC_COLLECT}"
           - name: FLT_INFLUX_DB_DSN
             value: "${FLT_INFLUX_DB_DSN}"
+          - name: FLT_LIVE_METRIC_DELAY
+            value: "${FLT_LIVE_METRIC_DELAY}"
           - name: FLT_DEBUG_MODE
             value: "${FLT_DEBUG_MODE}"
           image: ${APPLICATION_NAME}
