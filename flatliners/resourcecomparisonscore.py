@@ -2,7 +2,7 @@ from .baseflatliner import BaseFlatliner
 import flatliners
 from dataclasses import dataclass
 
-class ComparisonScore(BaseFlatliner):
+class ResourceComparisonScore(BaseFlatliner):
     def __init__(self):
         super().__init__()
 
