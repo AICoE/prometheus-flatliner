@@ -5,14 +5,13 @@ labels:
   application: ${APPLICATION_NAME}
 
 metadata:
-  name: prometheus-flatliner-live-deployment-template
+  name: prometheus-flatliner-deployment-template
 
 parameters:
 - name: NAMESPACE
   required: true
-- description: The name for job
-  from: 'prometheus-flatliner-historic-[a-z0-9]{4}'
-  generate: expression
+- description: The name for application
+  value: 'prometheus-flatliner'
   name: APPLICATION_NAME
   required: true
 - name: GIT_URI
@@ -29,9 +28,6 @@ parameters:
   required: true
 - name: FLT_METRIC_START_DATETIME
   description: Metric data timeframe - Start Time
-  required: true
-- name: FLT_METRIC_END_DATETIME
-  description: Metric data timeframe - End Time
   required: true
 - name: FLT_METRIC_CHUNK_SIZE
   description: Size of chunks of metrics collected from prometheus at an instance
@@ -132,8 +128,6 @@ objects:
             value: "${FLT_METRICS_LIST}"
           - name: FLT_METRIC_START_DATETIME
             value: "${FLT_METRIC_START_DATETIME}"
-          - name: FLT_METRIC_END_DATETIME
-            value: "${FLT_METRIC_END_DATETIME}"
           - name: FLT_METRIC_CHUNK_SIZE
             value: "${FLT_METRIC_CHUNK_SIZE}"
           - name: FLT_LIVE_METRIC_COLLECT
