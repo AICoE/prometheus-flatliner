@@ -35,15 +35,14 @@ oc_historic_job:
 oc_delete_historic_job:
 	oc delete all -l job_batch=prometheus-flatliner-historic-job
 
-oc_live_deploy:
-	oc process --filename=openshift/prometheus-flatliner-live-deployment-template.yaml \
-		--param APPLICATION_NAME="prometheus-flatliner-live-deployment" \
+oc_deploy:
+	oc process --filename=openshift/prometheus-flatliner-deployment-template.yaml \
+		--param APPLICATION_NAME="prometheus-flatliner" \
 		--param NAMESPACE=${NAMESPACE} \
 		--param FLT_PROM_URL=${FLT_PROM_URL} \
 		--param FLT_PROM_ACCESS_TOKEN="${FLT_PROM_ACCESS_TOKEN}" \
 		--param FLT_METRICS_LIST="${FLT_METRICS_LIST}" \
 		--param FLT_METRIC_START_DATETIME="${FLT_METRIC_START_DATETIME}" \
-		--param FLT_METRIC_END_DATETIME="${FLT_METRIC_END_DATETIME}" \
 		--param FLT_METRIC_CHUNK_SIZE="${FLT_METRIC_CHUNK_SIZE}" \
 		--param FLT_INFLUX_DB_DSN="${FLT_INFLUX_DB_DSN}" \
 		--param FLT_LIVE_METRIC_COLLECT="True" \
