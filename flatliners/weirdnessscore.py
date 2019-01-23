@@ -37,6 +37,7 @@ class WeirdnessScore(BaseFlatliner):
                 self.alert_score[cluster_name].cluster = cluster_name
 
             self.alert_score[cluster_name].version = x.version
+            self.alert_score[cluster_name].alert = x.alert
             self.alert_score[cluster_name].weirdness_score = x.comparison_score
             self.alert_score[cluster_name].timestamp = float(x.timestamp)
             self.alert_score[cluster_name].resource_deltas = x.resource_deltas
@@ -60,6 +61,7 @@ class WeirdnessScore(BaseFlatliner):
     class Alert_Sate:
         cluster: str = ""
         version: str = ""
+        alert: str = ""
         weirdness_score: float = 0.0
         timestamp: float = 0.0
         alert_deltas: str = ""
