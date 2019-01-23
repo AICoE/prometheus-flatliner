@@ -15,7 +15,7 @@ class InfluxdbStorage(BaseFlatliner):
         self.influx_dsn = influx_dsn
         self.client = InfluxDBClient.from_dsn(self.influx_dsn, timeout=30)
         self.buffer_list = []
-        self.buffer_size = 5000
+        self.buffer_size = 1000
         _LOGGER.info("InfluxDB connection initialized.")
 
     def on_next(self, x):
@@ -37,7 +37,10 @@ class InfluxdbStorage(BaseFlatliner):
             self.add_resource_metrics(x)
 
             if len(self.buffer_list) > self.buffer_size:
-                self.flush_buffer()
+                try:
+                    self.flush_buffer()
+                except:
+                    _LOGGER.exception("Failed to flush Influx Buffer. Buffer size:{0}".format(len(self.buffer_list)))
 
     def flush_buffer(self):
         _LOGGER.debug("Flushing Influx buffer data to the DB, buffer size:{0}".format(len(self.buffer_list)))
