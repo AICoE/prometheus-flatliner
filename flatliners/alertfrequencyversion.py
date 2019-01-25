@@ -1,4 +1,3 @@
-from datetime import datetime
 from .baseflatliner import BaseFlatliner
 from dataclasses import dataclass
 
