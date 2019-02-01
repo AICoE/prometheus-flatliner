@@ -49,6 +49,7 @@ class AlertComparisonScore(BaseFlatliner):
         state = self.State()
         state.cluster = x.cluster
         state.version = x.version
+        state.alert = x.alert
         state.comparison_score = 0
         state.timestamp = x.timestamp
         self.score[x.cluster] = state
@@ -83,6 +84,7 @@ class AlertComparisonScore(BaseFlatliner):
     class State:
         cluster: str = ""
         version:str = ""
+        alert:str = ""
         comparison_score: float = 0.0
         timestamp: float = 0.0
         alert_deltas:str =  ""

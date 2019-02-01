@@ -36,11 +36,38 @@ class InfluxdbStorage(BaseFlatliner):
 
             self.add_resource_metrics(x)
 
-            if len(self.buffer_list) > self.buffer_size:
-                try:
-                    self.flush_buffer()
-                except:
-                    _LOGGER.exception("Failed to flush Influx Buffer. Buffer size:{0}".format(len(self.buffer_list)))
+        if isinstance(x, flatliners.weirdnessscore.WeirdnessScore.Alert_Sate):
+            # add weirdness score
+            self.buffer_list.append({
+                "measurement": "alert_frequency_weirdness",
+                "tags": {
+                    "clusterID": x.cluster,
+                    "clusterVersion" : x.version
+                },
+                "time": datetime.utcfromtimestamp(x.timestamp).strftime('%Y-%m-%dT%H:%M:%SZ'),
+                "fields" : {
+                    "alert_weirdness_score": x.weirdness_score
+                }
+            })
+            # add relevant resource delta
+            self.buffer_list.append({
+                "measurement": "alert_delta",
+                "tags": {
+                    "clusterID": x.cluster,
+                    "clusterVersion": x.version, 
+                    "alert_type": x.alert
+                },
+                "time": datetime.utcfromtimestamp(x.timestamp).strftime('%Y-%m-%dT%H:%M:%SZ'),
+                "fields": {
+                    "alert_deltas": x.alert_deltas[x.alert]
+                }
+            })
+
+        if len(self.buffer_list) > self.buffer_size:
+            try:
+                self.flush_buffer()
+            except:
+                _LOGGER.exception("Failed to flush Influx Buffer. Buffer size:{0}".format(len(self.buffer_list)))
 
     def flush_buffer(self):
         _LOGGER.debug("Flushing Influx buffer data to the DB, buffer size:{0}".format(len(self.buffer_list)))
