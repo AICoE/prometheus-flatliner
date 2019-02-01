@@ -46,10 +46,20 @@ def main():
 
     std_dev_cluster = flatliners.StdDevCluster()  # this is an observer that operates on some cluster data
     std_dev_version = flatliners.StdDevVersion()  # this is an observer that operates on some version data
-    comparison_score = flatliners.ComparisonScore()
+    comparison_score = flatliners.ResourceComparisonScore()
+
+    alert_freq_cluster = flatliners.AlertFrequencyCluster()
+    alert_freq_version = flatliners.AlertFrequencyVersion()
+    alert_comparison = flatliners.AlertComparisonScore()
 
     single_value_metric = flatliners.SingleValueMetric()
     versioned_metrics.subscribe(single_value_metric)
+
+    single_value_metric.subscribe(alert_freq_cluster)
+    alert_freq_cluster.subscribe(alert_freq_version)
+
+    alert_freq_version.subscribe(alert_comparison)
+    alert_freq_cluster.subscribe(alert_comparison)
 
     # take etcd data and perform std_dev_cluster operation
     single_value_metric.subscribe(std_dev_cluster)
@@ -63,7 +73,7 @@ def main():
     weirdness_score = flatliners.WeirdnessScore()
     comparison_score.subscribe(weirdness_score)
 
-    # weirdness_score.subscribe(print)
+    #weirdness_score.subscribe(print)
 
     score_sum = 0
     def add_scores(value):
@@ -76,7 +86,7 @@ def main():
         influxdb_storage = flatliners.InfluxdbStorage(os.environ.get("FLT_INFLUX_DB_DSN"))
         weirdness_score.subscribe(influxdb_storage)
 
-    # connect the metrics stream to publish data
+    # # connect the metrics stream to publish data
     metrics_observable.connect()
 
     if os.getenv("FLT_LIVE_METRIC_COLLECT","False") == "True":
