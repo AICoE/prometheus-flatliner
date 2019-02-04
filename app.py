@@ -72,13 +72,16 @@ def main():
 
     weirdness_score = flatliners.WeirdnessScore()
     comparison_score.subscribe(weirdness_score)
+    alert_comparison.subscribe(weirdness_score)
 
     # weirdness_score.subscribe(print)
 
     score_sum = 0
+
     def add_scores(value):
         nonlocal score_sum
-        score_sum = score_sum + value.std_dev
+        if isinstance(value, flatliners.weirdnessscore.WeirdnessScore.Resource_State):
+            score_sum = score_sum + value.std_dev
 
     weirdness_score.subscribe(add_scores)
 
