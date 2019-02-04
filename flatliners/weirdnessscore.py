@@ -40,7 +40,7 @@ class WeirdnessScore(BaseFlatliner):
             self.alert_score[cluster_name].alert = x.alert
             self.alert_score[cluster_name].weirdness_score = x.comparison_score
             self.alert_score[cluster_name].timestamp = float(x.timestamp)
-            self.alert_score[cluster_name].resource_deltas = x.resource_deltas
+            self.alert_score[cluster_name].alert_deltas = x.alert_deltas
 
             self.publish(self.alert_score[cluster_name])
 
