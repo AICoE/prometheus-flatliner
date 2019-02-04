@@ -58,8 +58,14 @@ class AlertComparisonScore(BaseFlatliner):
         # Build the subtracted value array by matching values by alert names as no guarantee dictionaries are in order
         subtracted_metrics = []
         # Loop on cluster keys to avoid matching alerts found in version but not in cluster
+        # in some cases the cluster record is updated prior to the version, if/else circumvents this for now
+        # TODO: ensure version records always updated prior to cluster record
         for alert in list(self.clusters[x.cluster].keys()):
-            subtracted_metrics.append(self.versions[x.version][alert] - self.clusters[x.cluster][alert])
+            if alert not in self.versions[x.version]:
+                pass
+            else:
+                subtracted_metrics.append(self.versions[x.version][alert]
+                                          - self.clusters[x.cluster][alert])
         subtracted_metrics = array(subtracted_metrics)
         return norm(subtracted_metrics)
 
