@@ -35,6 +35,7 @@ class AlertFrequencyCluster(BaseFlatliner):
         else:
             self.calculate_frequency(alert_name,cluster_id, time_window, time_stamp)
 
+        self.normalize_cluster(cluster_id, alert_name)
         self.publish(self.clusters[cluster_id][alert_name])
 
 
@@ -62,6 +63,29 @@ class AlertFrequencyCluster(BaseFlatliner):
         # using the length of the timestamps should suffice to determine the frequency as the value is always 1
         self.clusters[cluster_id][alert_name].frequency = float(len(self.clusters[cluster_id]
                                                              [alert_name].time_stamps))
+
+
+    def normalize_cluster(self, cluster_id, alert):
+        # get the values:
+        alert_names = list(self.clusters[cluster_id].keys())
+        alert_vector_length = len(alert_names)
+        alert_list = []
+
+        if alert_vector_length == 1:
+            self.clusters[cluster_id][alert].frequency = 1.0
+            return
+
+        for i in alert_names:
+            alert_list.append(self.clusters[cluster_id][i].frequency)
+        max_value = max(alert_list)
+        min_value = min(alert_list)
+
+        for value, name in zip(alert_list, alert_names):
+            if max_value != min_value:
+                self.clusters[cluster_id][name].frequency = ((value - min_value)/(max_value - min_value))\
+                                                          / (alert_vector_length)**(0.5)
+            else:
+                self.clusters[cluster_id][name].frequency = 1.0
 
 
     @dataclass
