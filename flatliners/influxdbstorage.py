@@ -34,7 +34,20 @@ class InfluxdbStorage(BaseFlatliner):
                     }
                 })
 
-            self.add_resource_metrics(x)
+            self.buffer_list.append({
+                "measurement": "resource_deltas",
+                "tags": {
+                    "cluster_id": x.cluster,
+                    "cluster_version": x.version,
+                    "resource_type": x.resource
+                },
+                "time": datetime.utcfromtimestamp(x.std_dev_timestamp).strftime('%Y-%m-%dT%H:%M:%SZ'),
+                "fields": {
+                    "resource_deltas": x.resource_deltas[x.resource]
+
+                }
+            })
+
 
         if isinstance(x, flatliners.weirdnessscore.WeirdnessScore.Alert_Sate):
             # add weirdness score
@@ -74,20 +87,3 @@ class InfluxdbStorage(BaseFlatliner):
         self.client.write_points(self.buffer_list)
         self.buffer_list = []
 
-    def add_resource_metrics(self, x):
-
-        resources = list(x.resource_deltas.keys())
-        for resource in resources:
-            self.buffer_list.append({
-                "measurement": "resource_deltas",
-                "tags": {
-                    "cluster_id": x.cluster,
-                    "cluster_version": x.version,
-                    "resource_type": resource
-                },
-                "time": datetime.utcfromtimestamp(x.std_dev_timestamp).strftime('%Y-%m-%dT%H:%M:%SZ'),
-                "fields": {
-                    "resource_deltas": x.resource_deltas[resource]
-
-                }
-            })

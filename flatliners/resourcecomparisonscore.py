@@ -60,6 +60,7 @@ class ResourceComparisonScore(BaseFlatliner):
         state = self.State()
         state.cluster = cluster_id
         state.version = values.version
+        state.resource = values.resource
         state.std_norm = (sum(list(self.clusters[cluster_id].values())))**0.5
         state.timestamp = values.timestamp
         state.resource_deltas = self.resource_deltas[cluster_id]
@@ -80,6 +81,7 @@ class ResourceComparisonScore(BaseFlatliner):
 
         cluster: str = ""
         version: str = ""
+        resource: str = ""
         std_norm: float = 0.0
         timestamp:float = 0.0
         resource_deltas: str = ""
