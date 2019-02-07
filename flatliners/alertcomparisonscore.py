@@ -30,6 +30,7 @@ class AlertComparisonScore(BaseFlatliner):
                 self.initialize_metric_state(x)
 
             self.score[x.cluster].comparison_score = self.compute_norm(x)
+            self.score[x.cluster].timestamp = x.timestamp
             self.compute_alert_delta(x)
             if self.ready_to_publish(x):
                 self.publish(self.score[x.cluster])
