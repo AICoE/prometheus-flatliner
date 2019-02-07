@@ -25,9 +25,11 @@ objects:
           imagePullPolicy: Always
           resources:
             requests:
+              cpu: 1
               memory: 500Mi
             limits:
-              memory: 1Gi
+              cpu: 1
+              memory: 2Gi
           env:
           - name: FLT_PROM_URL
             value: "${FLT_PROM_URL}"
