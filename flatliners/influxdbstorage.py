@@ -15,7 +15,7 @@ class InfluxdbStorage(BaseFlatliner):
         self.influx_dsn = influx_dsn
         self.client = InfluxDBClient.from_dsn(self.influx_dsn, timeout=30)
         self.buffer_list = []
-        self.buffer_size = 1000
+        self.buffer_size = 5000
         _LOGGER.info("InfluxDB connection initialized.")
 
     def on_next(self, x):

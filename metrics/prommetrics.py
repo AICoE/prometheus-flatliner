@@ -60,11 +60,11 @@ class PromMetrics:
                 chunk_end_time = end          # Reduce the size of the last chunk to fit the specified datetime frame
 
             for metric_name in metrics_list:    # Loop to get a chunk of data for every metric in the list
-                _LOGGER.debug("Current Chunk Info: Metric = {0}, Time range = {1} - {2}".format(metric_name,
+                _LOGGER.info("Current Chunk Info: Metric = {0}, Time range = {1} - {2}".format(metric_name,
                                                                                 dateparser.parse(str(start)),
                                                                                 dateparser.parse(str(chunk_end_time))))
                 pkt_list = (prom.get_metric_range_data(metric_name=metric_name, start_time=start, end_time=chunk_end_time))
-                _LOGGER.debug("Collected {0} packets.".format(len(pkt_list)))
+                _LOGGER.info("Collected {0} packets.".format(len(pkt_list)))
 
                 for pkt in pkt_list:        # pkt_list contains a list of data for multiple metrics, each of which is pushed to the observer.
                     # print(dateparser.parse(str(pkt['values'][0][0])), "-", dateparser.parse(str(pkt['values'][-1][0])))

@@ -21,10 +21,10 @@ oc_trigger_build:
 
 oc_historic_job:
 	oc process --filename=openshift/prometheus-flatliner-job-template.yaml \
-		--param APPLICATION_NAME="prometheus-flatliner-historic-job" \
 		--param NAMESPACE=${NAMESPACE} \
 		--param FLT_PROM_URL=${FLT_PROM_URL} \
 		--param FLT_PROM_ACCESS_TOKEN="${FLT_PROM_ACCESS_TOKEN}" \
+		--param FLT_DEBUG_MODE="${FLT_DEBUG_MODE}" \
 		--param FLT_METRICS_LIST="${FLT_METRICS_LIST}" \
 		--param FLT_METRIC_START_DATETIME="${FLT_METRIC_START_DATETIME}" \
 		--param FLT_METRIC_END_DATETIME="${FLT_METRIC_END_DATETIME}" \
@@ -37,10 +37,10 @@ oc_delete_historic_job:
 
 oc_deploy:
 	oc process --filename=openshift/prometheus-flatliner-deployment-template.yaml \
-		--param APPLICATION_NAME="prometheus-flatliner" \
 		--param NAMESPACE=${NAMESPACE} \
 		--param FLT_PROM_URL=${FLT_PROM_URL} \
 		--param FLT_PROM_ACCESS_TOKEN="${FLT_PROM_ACCESS_TOKEN}" \
+		--param FLT_DEBUG_MODE="${FLT_DEBUG_MODE}" \
 		--param FLT_METRICS_LIST="${FLT_METRICS_LIST}" \
 		--param FLT_METRIC_START_DATETIME="${FLT_METRIC_START_DATETIME}" \
 		--param FLT_METRIC_CHUNK_SIZE="${FLT_METRIC_CHUNK_SIZE}" \
