@@ -60,3 +60,6 @@ historic_job:
 
 test:
 	PIPENV_DOTENV_LOCATION=.env.test pipenv run pytest
+
+clear_influx:
+	PIPENV_DOTENV_LOCATION=.env pipenv run python clear_influx.py
