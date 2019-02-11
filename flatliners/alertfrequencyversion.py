@@ -42,7 +42,7 @@ class AlertFrequencyVersion(BaseFlatliner):
         state.alert = x.alert
         state.version = x.version
         state.cluster_frequencies = {x.cluster : x.frequency}
-        state.avg_frequency = x.frequency
+        state.avg_frequency = x.avg_frequency
         state.timestamp = x.timestamp
         self.version_frequencies[x.version][x.alert] = state
 
@@ -50,7 +50,7 @@ class AlertFrequencyVersion(BaseFlatliner):
     def update_version_alert(self,x,previous):
 
         # update cluster frequency
-        previous.cluster_frequencies[x.cluster] = x.frequency
+        previous.cluster_frequencies[x.cluster] = x.avg_frequency
         # compute average frequency
         previous_values = list(previous.cluster_frequencies.values())
         previous.avg_frequency = sum(previous_values) / float(len(previous_values))

@@ -64,6 +64,20 @@ class AlertFrequencyCluster(BaseFlatliner):
         self.clusters[cluster_id][alert_name].frequency = float(len(self.clusters[cluster_id]
                                                              [alert_name].time_stamps))
 
+        previous =  self.clusters[cluster_id][alert_name]
+        self.update_harmonic_mean(previous)
+
+
+    def update_harmonic_mean(self,previous):
+
+        frequency = previous.frequency
+        current_count = previous.count + 1
+        current_total = previous.total + (1.0/frequency)
+        previous.avg_frequency = current_count/current_total
+        previous.count = current_count
+        previous.total = current_total
+        self.clusters[previous.cluster][previous.alert] = previous
+
 
     def normalize_cluster(self, cluster_id, alert):
         # get the values:
@@ -95,5 +109,8 @@ class AlertFrequencyCluster(BaseFlatliner):
         alert: str = ""
         version: str = ""
         frequency: float = 0.0
+        avg_frequency: float = 0.0
         timestamp: float = 0.0
         time_stamps: str = ""
+        total: float = 0.0
+        count:  float = 0.0

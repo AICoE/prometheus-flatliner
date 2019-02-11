@@ -44,7 +44,7 @@ class AlertComparisonScore(BaseFlatliner):
     def update_cluster_alerts(self,x):
         if x.cluster not in self.clusters:
             self.clusters[x.cluster] = dict()
-        self.clusters[x.cluster][x.alert] = x.frequency
+        self.clusters[x.cluster][x.alert] = x.avg_frequency
 
     def initialize_metric_state(self,x):
         state = self.State()
