@@ -28,7 +28,7 @@ class InfluxdbStorage(BaseFlatliner):
                     "clusterID": x.cluster,
                     "clusterVersion": x.version
                 },
-                "time": datetime.utcfromtimestamp(x.std_dev_timestamp).strftime('%Y-%m-%dT%H:%M:%SZ'),
+                "time": datetime.utcfromtimestamp(x.timestamp).strftime('%Y-%m-%dT%H:%M:%SZ'),
                 "fields": {
                     "weirdness_score": x.weirdness_score
                     }
@@ -41,7 +41,7 @@ class InfluxdbStorage(BaseFlatliner):
                     "cluster_version": x.version,
                     "resource_type": x.resource
                 },
-                "time": datetime.utcfromtimestamp(x.std_dev_timestamp).strftime('%Y-%m-%dT%H:%M:%SZ'),
+                "time": datetime.utcfromtimestamp(x.timestamp).strftime('%Y-%m-%dT%H:%M:%SZ'),
                 "fields": {
                     "resource_deltas": x.resource_deltas[x.resource]
 
@@ -67,7 +67,7 @@ class InfluxdbStorage(BaseFlatliner):
                 "measurement": "alert_delta",
                 "tags": {
                     "clusterID": x.cluster,
-                    "clusterVersion": x.version, 
+                    "clusterVersion": x.version,
                     "alert_type": x.alert
                 },
                 "time": datetime.utcfromtimestamp(x.timestamp).strftime('%Y-%m-%dT%H:%M:%SZ'),
@@ -86,4 +86,3 @@ class InfluxdbStorage(BaseFlatliner):
         _LOGGER.debug("Flushing Influx buffer data to the DB, buffer size:{0}".format(len(self.buffer_list)))
         self.client.write_points(self.buffer_list)
         self.buffer_list = []
-

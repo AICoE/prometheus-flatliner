@@ -9,3 +9,4 @@ from .alertcomparisonscore import AlertComparisonScore
 from .weirdnessscore import WeirdnessScore
 from .influxdbstorage import InfluxdbStorage
 from .singlevaluemetric import SingleValueMetric
+from .prometheusendpoint import PrometheusEndpoint

@@ -89,12 +89,17 @@ def main():
         influxdb_storage = flatliners.InfluxdbStorage(os.environ.get("FLT_INFLUX_DB_DSN"))
         weirdness_score.subscribe(influxdb_storage)
 
-    # # connect the metrics stream to publish data
-    metrics_observable.connect()
-
     if os.getenv("FLT_LIVE_METRIC_COLLECT","False") == "True":
-        while True:
-            sleep(60) # This should be replaced by a flask app that serves weirdness_score as a metric
+        prom_endpoint = flatliners.PrometheusEndpoint()
+        weirdness_score.subscribe(prom_endpoint)
+
+        # connect the metrics stream to publish data
+        metrics_observable.connect()
+
+        prom_endpoint.start_server()
+
+    # connect the metrics stream to publish data
+    metrics_observable.connect()
 
     return score_sum # This score sum is different for different chunk sizes, we might wanna look into different metrics for this
 
