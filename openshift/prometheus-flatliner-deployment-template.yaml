@@ -37,9 +37,9 @@ parameters:
   required: true
 - name: FLT_INFLUX_DB_DSN
   description: The URL to connect to an influx database
-  required: true
+  required: false
 - name: FLT_LIVE_METRIC_DELAY
-  description: The rolling delay while collecting live metrics (now = no delay, 5m = 5 minutes of delay) 
+  description: The rolling delay while collecting live metrics (now = no delay, 5m = 5 minutes of delay)
   value: 'now'
   required: false
 - name: FLT_DEBUG_MODE
@@ -161,3 +161,27 @@ objects:
           name: ${APPLICATION_NAME}:latest
       type: ImageChange
     - type: ConfigChange
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: ${APPLICATION_NAME}-service
+    labels:
+      app: ${APPLICATION_NAME}
+  spec:
+    ports:
+    - port: 8000
+      name: http
+    selector:
+      app: ${APPLICATION_NAME}
+
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    name: ${APPLICATION_NAME}-route
+    labels:
+      app: ${APPLICATION_NAME}
+  spec:
+    to:
+      kind: Service
+      name: ${APPLICATION_NAME}-service

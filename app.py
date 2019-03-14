@@ -1,6 +1,7 @@
 import flatliners
 import metrics
 import os
+import dateparser
 from time import sleep
 import logging
 
@@ -89,14 +90,22 @@ def main():
         influxdb_storage = flatliners.InfluxdbStorage(os.environ.get("FLT_INFLUX_DB_DSN"))
         weirdness_score.subscribe(influxdb_storage)
 
-    # # connect the metrics stream to publish data
-    metrics_observable.connect()
-
     if os.getenv("FLT_LIVE_METRIC_COLLECT","False") == "True":
-        while True:
-            sleep(60) # This should be replaced by a flask app that serves weirdness_score as a metric
+        # Published Stale metrics are removed once every three times metric data is collected from prometheus
+        metric_pruning_interval = 3 * round((dateparser.parse('now')-dateparser.parse(os.getenv("FLT_METRIC_CHUNK_SIZE","5m"))).total_seconds())
 
-    return score_sum # This score sum is different for different chunk sizes, we might wanna look into different metrics for this
+        prom_endpoint = flatliners.PrometheusEndpoint(pruning_interval=metric_pruning_interval)
+        weirdness_score.subscribe(prom_endpoint)
+
+        # connect the metrics stream to publish data
+        metrics_observable.connect()
+
+        prom_endpoint.start_server() # this method never returns, starts a web server
+    else:
+        # connect the metrics stream to publish data
+        metrics_observable.connect()
+
+        return score_sum
 
 
 if __name__ == '__main__':

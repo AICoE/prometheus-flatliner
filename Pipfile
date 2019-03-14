@@ -11,6 +11,7 @@ apscheduler = "*"
 dateparser = "*"
 retrying = "*"
 dataclasses = "*"
+prometheus_client = "*"
 
 [dev-packages]
 pytest = "*"
