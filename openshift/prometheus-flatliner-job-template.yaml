@@ -43,6 +43,8 @@ objects:
             value: "${FLT_METRIC_END_DATETIME}"
           - name: FLT_METRIC_CHUNK_SIZE
             value: "${FLT_METRIC_CHUNK_SIZE}"
+          - name: FLT_VERSION_FILTER_REGEX
+            value: "${FLT_VERSION_FILTER_REGEX}"
           - name: FLT_INFLUX_DB_DSN
             value: "${FLT_INFLUX_DB_DSN}"
           - name: FLT_DEBUG_MODE
@@ -82,3 +84,6 @@ parameters:
   description: Enable verbose log for debugging
   value: 'False'
   required: false
+- name: FLT_VERSION_FILTER_REGEX
+  description: Regex expression to filter for metrics based on version info
+  value: '^[0-9]*\.[0-9]*\.[0-9]*-[0-9]*\.[0-9]*$'

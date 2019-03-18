@@ -38,6 +38,9 @@ parameters:
 - name: FLT_INFLUX_DB_DSN
   description: The URL to connect to an influx database
   required: false
+- name: FLT_VERSION_FILTER_REGEX
+  description: Regex expression to filter for metrics based on version info
+  value: '^[0-9]*\.[0-9]*\.[0-9]*-[0-9]*\.[0-9]*$'
 - name: FLT_LIVE_METRIC_DELAY
   description: The rolling delay while collecting live metrics (now = no delay, 5m = 5 minutes of delay)
   value: 'now'
@@ -136,6 +139,8 @@ objects:
             value: "${FLT_INFLUX_DB_DSN}"
           - name: FLT_LIVE_METRIC_DELAY
             value: "${FLT_LIVE_METRIC_DELAY}"
+          - name: FLT_VERSION_FILTER_REGEX
+            value: "${FLT_VERSION_FILTER_REGEX}"
           - name: FLT_DEBUG_MODE
             value: "${FLT_DEBUG_MODE}"
           image: ${APPLICATION_NAME}
