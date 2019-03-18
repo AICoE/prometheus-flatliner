@@ -28,7 +28,7 @@ class PrometheusEndpoint(BaseFlatliner):
             # Store timestamp when the metric was published and metric version info
             self.published_metric_timestamps[str(x.cluster)] = [int(time()),str(x.version)]
         except Exception as e:
-            _LOGGER.error("Couldn't process the following packet {0}. Reason: {1}".format(x,str(e)))
+            _LOGGER.error("Couldn't process the following packet {0}. Reason: {1}".format(x, str(e)))
             raise e
 
     def _delete_stale_metrics(self):
@@ -46,7 +46,9 @@ class PrometheusEndpoint(BaseFlatliner):
 
     def start_server(self):
         # Start http server to expose metrics
-        start_http_server(8000)
+        http_server_port = 8000
+        start_http_server(http_server_port)
+        _LOGGER.info("http server started on port {0}".format(http_server_port))
         while True:
             # delete stale exposed metrics
             self._delete_stale_metrics()
