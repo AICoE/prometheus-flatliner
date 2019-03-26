@@ -1,3 +1,5 @@
+from cachetools import LRUCache
+
 from dataclasses import dataclass
 
 from .baseflatliner import BaseFlatliner
@@ -9,10 +11,10 @@ class AlertFrequencyCluster(BaseFlatliner):
 
     """
 
-    def __init__(self):
+    def __init__(self, max_cache_size: int = 500):
         super().__init__()
         # Hold the values for different clusters
-        self.clusters = dict()
+        self.clusters = LRUCache(maxsize=max_cache_size)
 
     def on_next(self, x):
         """ On each entry we will update the frequency of alerts for a 30 minute time window
@@ -27,7 +29,7 @@ class AlertFrequencyCluster(BaseFlatliner):
         time_window = 30  # in minutes
 
         if cluster_id not in self.clusters:
-             self.clusters[cluster_id] = dict()
+            self.clusters[cluster_id] = dict()
 
         if alert_name not in self.clusters[cluster_id]:
             self.intilize_freqency(x, alert_name,cluster_id)

@@ -1,12 +1,14 @@
 from .baseflatliner import BaseFlatliner
 
+from cachetools import LRUCache
+
 
 class VersionedMetrics(BaseFlatliner):
-    def __init__(self):
+    def __init__(self, max_cache_size: int = 500):
         super().__init__()
 
         # dict for versions that we already know
-        self.cluster_versions = dict()
+        self.cluster_versions = LRUCache(maxsize=max_cache_size)
 
         # buffer for metrics whose versions are unknown
         self.buffer = dict()

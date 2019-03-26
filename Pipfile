@@ -12,6 +12,7 @@ dateparser = "*"
 retrying = "*"
 dataclasses = "*"
 prometheus_client = "*"
+cachetools = "*"
 
 [dev-packages]
 pytest = "*"

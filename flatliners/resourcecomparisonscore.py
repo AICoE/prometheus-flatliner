@@ -2,14 +2,16 @@ from .baseflatliner import BaseFlatliner
 import flatliners
 from dataclasses import dataclass
 
+from cachetools import LRUCache
+
 class ResourceComparisonScore(BaseFlatliner):
-    def __init__(self):
+    def __init__(self, max_cache_size: int = 500):
         super().__init__()
 
-        self.score = dict()
-        self.clusters = dict()
-        self.versions = dict()
-        self.resource_deltas = dict()
+        self.score = LRUCache(maxsize=max_cache_size)
+        self.clusters = LRUCache(maxsize=max_cache_size)
+        self.versions = LRUCache(maxsize=max_cache_size)
+        self.resource_deltas = LRUCache(maxsize=max_cache_size)
 
 
     def on_next(self, x):
@@ -55,7 +57,7 @@ class ResourceComparisonScore(BaseFlatliner):
         if cluster_id not in self.resource_deltas:
             self.resource_deltas[cluster_id] = dict()
         self.resource_deltas[cluster_id][resource] = abs(self.clusters[cluster_id][resource]-
-                             self.versions[version_id][resource])
+                                                         self.versions[version_id][resource])
 
         state = self.State()
         state.cluster = cluster_id
@@ -68,13 +70,10 @@ class ResourceComparisonScore(BaseFlatliner):
         self.score[cluster_id] = state
 
     def ready_to_publish(self, x):
-          cluster_id = x.cluster
-          resoure_name = x.resource
-        
-          if resoure_name in self.clusters[cluster_id].keys():
-              return True
-          else:
-              return False
+        cluster_id = x.cluster
+        resoure_name = x.resource
+
+        return bool(resoure_name in self.clusters[cluster_id].keys())
 
     @dataclass
     class State:
@@ -83,5 +82,5 @@ class ResourceComparisonScore(BaseFlatliner):
         version: str = ""
         resource: str = ""
         std_norm: float = 0.0
-        timestamp:float = 0.0
+        timestamp: float = 0.0
         resource_deltas: str = ""

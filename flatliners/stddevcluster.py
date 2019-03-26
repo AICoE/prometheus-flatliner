@@ -2,12 +2,13 @@ from .baseflatliner import BaseFlatliner
 from statistics import stdev
 from dataclasses import dataclass
 
+from cachetools import LRUCache
 
 class StdDevCluster(BaseFlatliner):
-    def __init__(self):
+    def __init__(self, max_cache_size: int = 500):
         super().__init__()
 
-        self.clusters = dict()
+        self.clusters = LRUCache(maxsize=max_cache_size)
 
     def on_next(self, x):
         """ update calculate std dev for cluster
@@ -86,10 +87,10 @@ class StdDevCluster(BaseFlatliner):
             mean = int(values[0][1])
             m2 = 0
 
-        return count, mean,total, std_dev, m2
+        return count, mean, total, std_dev, m2
 
 
-    def calculate_stdv(self, values, name, cluster, version, previous = None):
+    def calculate_stdv(self, values, name, cluster, version, previous=None):
         if previous:
             count, mean, total, std_dev, m2 = self.continue_calculation(values, previous)
         else:
@@ -142,6 +143,3 @@ class StdDevCluster(BaseFlatliner):
         count: float = 0.0
         version: str = ""
         timestamp: float = 0.0
-
-
-

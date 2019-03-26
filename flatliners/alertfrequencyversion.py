@@ -1,6 +1,7 @@
 from .baseflatliner import BaseFlatliner
 from dataclasses import dataclass
 
+from cachetools import LRUCache
 
 class AlertFrequencyVersion(BaseFlatliner):
 
@@ -9,11 +10,11 @@ class AlertFrequencyVersion(BaseFlatliner):
     alert correlation shift over multiple gitversion
     """
 
-    def __init__(self):
+    def __init__(self, max_cache_size: int = 500):
         super().__init__()
 
         # holds the state objects for each version and alert
-        self.version_frequencies = dict()
+        self.version_frequencies = LRUCache(maxsize=max_cache_size)
 
     def on_next(self, x):
         """ On each data loading it will calculate the average alert frequency for an alert
@@ -30,7 +31,7 @@ class AlertFrequencyVersion(BaseFlatliner):
 
         else:
             previous = self.version_frequencies[version][alert]
-            self.update_version_alert(x,previous)
+            self.update_version_alert(x, previous)
 
         self.publish(self.version_frequencies[version][alert])
 
@@ -47,7 +48,7 @@ class AlertFrequencyVersion(BaseFlatliner):
         self.version_frequencies[x.version][x.alert] = state
 
 
-    def update_version_alert(self,x,previous):
+    def update_version_alert(self, x, previous):
 
         # update cluster frequency
         previous.cluster_frequencies[x.cluster] = x.frequency
@@ -57,7 +58,7 @@ class AlertFrequencyVersion(BaseFlatliner):
         # update time_stamp
         previous.timestamp = x.timestamp
         # reset entry
-        self.version_frequencies[x.version][x.alert] =  previous
+        self.version_frequencies[x.version][x.alert] = previous
 
 
 

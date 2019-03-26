@@ -1,14 +1,16 @@
 from .baseflatliner import BaseFlatliner
 import flatliners
 
+from cachetools import LRUCache
+
 from dataclasses import dataclass
 
 class WeirdnessScore(BaseFlatliner):
-    def __init__(self):
+    def __init__(self, max_cache_size: int = 500):
         super().__init__()
 
-        self.resource_score = dict()
-        self.alert_score = dict()
+        self.resource_score = LRUCache(maxsize=max_cache_size)
+        self.alert_score = LRUCache(maxsize=max_cache_size)
 
     def on_next(self, x):
 
@@ -55,7 +57,7 @@ class WeirdnessScore(BaseFlatliner):
         resource: str = ""
         std_dev: float = 0.0
         timestamp: float = 0.0
-        weirdness_score:float = 0.0
+        weirdness_score: float = 0.0
         std_dev_buffer: bool = False
         resource_deltas: str = ""
 

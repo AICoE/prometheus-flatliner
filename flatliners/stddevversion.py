@@ -1,12 +1,13 @@
 from .baseflatliner import BaseFlatliner
 from dataclasses import dataclass
 
+from cachetools import LRUCache
 
 class StdDevVersion(BaseFlatliner):
-    def __init__(self):
+    def __init__(self, max_cache_size: int = 500):
         super().__init__()
 
-        self.versions = dict()
+        self.versions = LRUCache(maxsize=max_cache_size)
 
     def on_next(self, x):
         """ update std dev for version
@@ -30,13 +31,13 @@ class StdDevVersion(BaseFlatliner):
         else:
             previous = self.versions[version_id][resource]
             self.versions[version_id][resource] = self.calculate_version_std(value, resource,
-                                                                       version_id, previous)
+                                                                             version_id, previous)
 
         self.publish(self.versions[version_id][resource])
 
 
 
-    def calculate_version_std(self, value, resource, version, previous = None):
+    def calculate_version_std(self, value, resource, version, previous=None):
         # TODO: chnage from avg std to actual std for all availble resources in clusters with shared versions.
         if previous:
             count = previous.count + 1
@@ -64,6 +65,6 @@ class StdDevVersion(BaseFlatliner):
 
         resource: str = ""
         avg_std_dev: float = 0.0
-        total:float = 0.0
-        count:float = 0.0
-        version:str = ""
+        total: float = 0.0
+        count: float = 0.0
+        version: str = ""

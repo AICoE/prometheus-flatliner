@@ -5,14 +5,16 @@ from numpy import array
 from dataclasses import dataclass
 import flatliners
 
+from cachetools import LRUCache
+
 class AlertComparisonScore(BaseFlatliner):
-    def __init__(self):
+    def __init__(self, max_cache_size: int = 500):
         super().__init__()
 
-        self.score = dict()
-        self.clusters = dict()
-        self.versions = dict()
-        self.alert_deltas = dict()
+        self.score = LRUCache(maxsize=max_cache_size)
+        self.clusters = LRUCache(maxsize=max_cache_size)
+        self.versions = LRUCache(maxsize=max_cache_size)
+        self.alert_deltas = LRUCache(maxsize=max_cache_size)
 
     def on_next(self, x):
         """ update l2 distance between cluster vector and baseline vector
@@ -36,17 +38,17 @@ class AlertComparisonScore(BaseFlatliner):
                 self.publish(self.score[x.cluster])
 
 
-    def update_version_alerts(self,x):
+    def update_version_alerts(self, x):
         if x.version not in self.versions:
-            self.versions[x.version]= dict()
+            self.versions[x.version] = dict()
         self.versions[x.version][x.alert] = x.avg_frequency
 
-    def update_cluster_alerts(self,x):
+    def update_cluster_alerts(self, x):
         if x.cluster not in self.clusters:
             self.clusters[x.cluster] = dict()
         self.clusters[x.cluster][x.alert] = x.frequency
 
-    def initialize_metric_state(self,x):
+    def initialize_metric_state(self, x):
         state = self.State()
         state.cluster = x.cluster
         state.version = x.version
@@ -70,11 +72,11 @@ class AlertComparisonScore(BaseFlatliner):
         subtracted_metrics = array(subtracted_metrics)
         return norm(subtracted_metrics)
 
-    def compute_alert_delta(self,x):
+    def compute_alert_delta(self, x):
         delta = abs(self.versions[x.version][x.alert] - self.clusters[x.cluster][x.alert])
         if x.cluster not in self.alert_deltas:
             self.alert_deltas[x.cluster] = dict()
-        self.alert_deltas[x.cluster][x.alert]  = delta
+        self.alert_deltas[x.cluster][x.alert] = delta
         self.score[x.cluster].alert_deltas = self.alert_deltas[x.cluster]
 
     def ready_to_publish(self, x):
@@ -90,8 +92,8 @@ class AlertComparisonScore(BaseFlatliner):
     @dataclass
     class State:
         cluster: str = ""
-        version:str = ""
-        alert:str = ""
+        version: str = ""
+        alert: str = ""
         comparison_score: float = 0.0
         timestamp: float = 0.0
-        alert_deltas:str =  ""
+        alert_deltas: str = ""
