@@ -54,7 +54,16 @@ def main():
     alert_comparison = flatliners.AlertComparisonScore()
 
     single_value_metric = flatliners.SingleValueMetric()
-    versioned_metrics.subscribe(single_value_metric)
+
+    # Check if the feature flag for Version filter is set
+    if os.getenv("FLT_VERSION_FILTER_REGEX"):
+        version_regex = os.getenv("FLT_VERSION_FILTER_REGEX")
+        version_filtered_metrics = flatliners.VersionFilter(version_regex=version_regex)
+        versioned_metrics.subscribe(version_filtered_metrics)
+        version_filtered_metrics.subscribe(single_value_metric)
+    else:
+        # if flag is not set, bypass the filter
+        versioned_metrics.subscribe(single_value_metric)
 
     single_value_metric.subscribe(alert_freq_cluster)
     alert_freq_cluster.subscribe(alert_freq_version)
