@@ -1,12 +1,14 @@
 from .baseflatliner import BaseFlatliner
 
-
 class VersionedMetrics(BaseFlatliner):
     def __init__(self):
         super().__init__()
 
-        # dict for versions that we already know
-        self.cluster_versions = dict()
+        # caches the version for a specific cluster_id,
+        # e.g. cluster_versions['_id_123'] = 'version4'
+        # the expected size the number of clusters reporting into telemeter
+        # promql: count (count by (_id) (cluster_version))
+        self.cluster_versions = self.create_cache_dict(maxsize=1000)
 
         # buffer for metrics whose versions are unknown
         self.buffer = dict()
