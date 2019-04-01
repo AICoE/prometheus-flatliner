@@ -1,7 +1,7 @@
 from rx import Observer
 from rx.subjects import Subject
 
-from cachetools import TTLCache
+from cachetools import LRUCache
 
 class BaseFlatliner(Observer):
     subject = None
@@ -43,11 +43,8 @@ class BaseFlatliner(Observer):
         return self.metric_label(x, 'version')
 
     @staticmethod
-    def create_cache_dict(maxsize=2000, ttl=900):
+    def create_cache_dict(maxsize=2000):
         # maxsize determines the maximum number of elements inside the dictionary
         # if new elements are added when its full, it will act as a LRUCache.
 
-        # ttl determines the time to live for each element in the dictionary, so
-        # $(ttl) seconds after the element is added, it will be marked for deletion
-        # if the element is updated, the timer resets.
-        return TTLCache(maxsize=maxsize, ttl=ttl)
+        return LRUCache(maxsize=maxsize)
