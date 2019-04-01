@@ -12,12 +12,10 @@ class AlertFrequencyCluster(BaseFlatliner):
     def __init__(self):
         super().__init__()
         # Hold the values for different clusters
-        # The values in the dict should be valid for at least the duration of the
-        # time_window specified in the on_next method, so ttl>=1800 in seconds
         # For maxsize, it should be bigger than the number of new cluster ids coming
         # in during the time window (30 mins)
         # promql: count(sum(count_over_time(cluster_version[30m])) by (_id))
-        self.clusters = self.create_cache_dict(maxsize=1000, ttl=2000)
+        self.clusters = self.create_cache_dict(maxsize=1000)
 
     def on_next(self, x):
         """ On each entry we will update the frequency of alerts for a 30 minute time window
