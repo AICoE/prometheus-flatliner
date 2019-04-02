@@ -9,10 +9,68 @@ class AlertComparisonScore(BaseFlatliner):
     def __init__(self):
         super().__init__()
 
-        self.score = dict()
-        self.clusters = dict()
-        self.versions = dict()
-        self.alert_deltas = dict()
+        # this dict stores the score for each cluster, so it should
+        # be big enough to accomodate recent clusters coming in
+        # promql: count (count (alerts) by (_id))
+        # example:
+        # {fbc1adc6-6ff0-4afc-affe-ff0594d6c7d8: {cluster='fbc1adc6-6ff0-4afc-affe-ff0594d6c7d8',
+        #                                         version='4.0.0-0.1',
+        #                                         alert='CPUThrottlingHigh',
+        #                                         comparison_score=0.0,
+        #                                         timestamp=1554217799.252,
+        #                                         alert_deltas={'CPUThrottlingHigh': 0.0,
+        #                                                       'CoreDNSDown': 0.0,
+        #                                                       'DeadMansSwitch': 0.0,
+        #                                                       'KubeAPIErrorsHigh': 0.0,
+        #                                                       'KubeClientErrors': 0.0,
+        #                                                       'KubeControllerManagerDown': 0.0,
+        #                                                       'KubeSchedulerDown': 0.0})}
+        self.score = self.create_cache_dict(maxsize=1000)
+
+        # this dict stores alerts for each cluster, so it should
+        # be big enough to accomodate recent clusters coming in
+        # promql: count (count (alerts) by (_id))
+        # example:
+        # {fbc1adc6-6ff0-4afc-affe-ff0594d6c7d8: {'CPUThrottlingHigh': 1.0,
+        #                                         'CoreDNSDown': 1.0,
+        #                                         'DeadMansSwitch': 1.0,
+        #                                         'KubeAPIErrorsHigh': 0.5,
+        #                                         'KubeClientErrors': 0.4472135954999579,
+        #                                         'KubeControllerManagerDown': 0.4082482904638631,
+        #                                         'KubeSchedulerDown': 0.3779644730092272,
+        #                                         'KubeVersionMismatch': 0.35355339059327373}
+        self.clusters = self.create_cache_dict(maxsize=1000)
+
+        # this dict stores alerts for each version, so it should
+        # be big enough to accomodate recent versions coming in
+        # promql: count (count (cluster_version) by (version))
+        # example:
+        # {4.0.0-0.7: {'KubeClientCertificateExpiration': 0.9948453608247423,
+        #              'TargetDown': 0.9499880635026346,
+        #              'Watchdog': 0.965060952797281,
+        #              'OCS_CephPgStuck': 1.0,
+        #              'KubeJobFailed': 1.0,
+        #              'KubeClientErrors': 0.9511844635310913,
+        #              'ClusterMonitoringOperatorErrors': 1.0,
+        #              'KubeAPIErrorsHigh': 0.7071067811865475,
+        #              'KubeAPILatencyHigh': 0.5773502691896258,
+        #              'KubeDaemonSetMisScheduled': 0.4472135954999579,
+        #              'KubeDaemonSetRolloutStuck': 0.4082482904638631,
+        #              'KubeNodeNotReady': 0.3779644730092272,
+        #              'KubePodNotReady': 0.7845177968644247,
+        #              'KubeStatefulSetReplicasMismatch': 0.3333333333333333,
+        #              'KubeDeploymentReplicasMismatch': 1.0,
+        #              'KubeMemOvercommit': 1.0}
+        self.versions = self.create_cache_dict(maxsize=200)
+
+        # this dict stores alert deltas for each cluster, so it should
+        # be big enough to accomodate recent clusters coming in
+        # promql: count (count (alerts) by (_id))
+        # example:
+        # {ff2c773b-a2de-43b6-a501-36274cc8a1a5: {'KubeClientCertificateExpiration': 0.008346244408562575,
+        #                                         'TargetDown': 0.060063351955155886,
+        #                                         'Watchdog': 0.040937763985934184}
+        self.alert_deltas = self.create_cache_dict(maxsize=1000)
 
     def on_next(self, x):
         """ update l2 distance between cluster vector and baseline vector
