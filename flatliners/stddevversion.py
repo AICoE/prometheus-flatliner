@@ -1,12 +1,25 @@
 from .baseflatliner import BaseFlatliner
 from dataclasses import dataclass
 
-
 class StdDevVersion(BaseFlatliner):
     def __init__(self):
         super().__init__()
 
-        self.versions = dict()
+        # this dict needs to store a StdDevVersion.State object  for every resource
+        # in a Version
+        # promql: count (count (cluster_version) by (version))
+        # {4.0.0-0.9: {'alertmanagers.monitoring.coreos.com':
+        #                        (resource='alertmanagers.monitoring.coreos.com',
+        #                         avg_std_dev=0.0,
+        #                         total=0.0,
+        #                         count=4,
+        #                         version='4.0.0-0.9'),
+        #                'apiservices.apiregistration.k8s.io':
+        #                        (resource='apiservices.apiregistration.k8s.io',
+        #                         avg_std_dev=0.02182178902359924,
+        #                         total=0.1091089451179962,
+        #                         count=5, version='4.0.0-0.9'), ........
+        self.versions = self.create_cache_dict(maxsize=200)
 
     def on_next(self, x):
         """ update std dev for version
