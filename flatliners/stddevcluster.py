@@ -2,12 +2,24 @@ from .baseflatliner import BaseFlatliner
 from statistics import stdev
 from dataclasses import dataclass
 
-
 class StdDevCluster(BaseFlatliner):
     def __init__(self):
         super().__init__()
 
-        self.clusters = dict()
+        # this dict needs to store a StdDevCluster.State object  for every resource
+        # in a cluster
+        # promql: count (count (etcd_object_counts) by (_id))
+        # {022b5bf4-c124-41b7-9be6-db24079e45ce:
+        #        {'alertmanagers.monitoring.coreos.com': (cluster='022b5bf4-c124-41b7-9be6-db24079e45ce',
+        #                                                 resource='alertmanagers.monitoring.coreos.com',
+        #                                                 std_dev=0.0,
+        #                                                 m2=0.0,
+        #                                                 mean=0.5,
+        #                                                 total=0.0,
+        #                                                 count=2,
+        #                                                 version='4.0.0-0.9',
+        #                                                 timestamp=1554390815.484) ................
+        self.clusters = self.create_cache_dict(maxsize=1000)
 
     def on_next(self, x):
         """ update calculate std dev for cluster
