@@ -4,6 +4,15 @@
       jobs:
         - "thoth-coala"
         - "thoth-pytest"
+    
+    post:
+      jobs:
+        - "trigger-build":
+            vars:
+              cluster: "paas.psi.redhat.com"
+              namespace: "aiops-prod-prometheus-lts"
+              buildConfigName: "telemetry-flatliner"
+              
     kebechet-auto-gate:
       jobs:
         - "thoth-coala"
