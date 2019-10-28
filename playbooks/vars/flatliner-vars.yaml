@@ -1,0 +1,17 @@
+---
+flatliner_app_name: "flatliner-playbook"
+flatliner_git_uri: "https://github.com/AICoE/prometheus-flatliner.git"
+flatliner_git_ref: "master"
+flatliner_container_cpu_limit: "2"
+flatliner_container_memory_limit: "1Gi"
+
+flatliner_prometheus_url: >-
+  http://<enter-prometheus-route>
+flatliner_prometheus_oauth_token: "my-oauth-token"
+flatliner_metrics_list: "cluster_version,etcd_object_counts,alerts"
+flatliner_metrics_start_datetime: "01 October 2019"
+flatliner_metrics_chunk_size: "15m"
+flatliner_live_metric_collect: "True"
+flatliner_live_metric_delay: "now"
+flatliner_version_filter_regex: ".*"
+flatliner_debug_mode: "False"

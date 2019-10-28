@@ -69,6 +69,8 @@ This will delete the deployed container
 #### Live data collection deployment
 After setting up the `ENV_FILE` variable in your Makefile, run the following command
 
+* method 1: Using the Makefile
+
 ```
 make oc_live_deploy
 ```
@@ -77,6 +79,15 @@ This will create a deployment of this app which will keep running according to t
 To delete this deployment, run the following command:
 ```
 make oc_delete_live_deployment
+```
+
+* method 2: Using the ansible playbook
+
+Populate all the required variables in vars files located in the `/playbooks/vars` directory.
+
+Then run the following command:
+```
+ansible-playbook playbooks/flatliner.yaml
 ```
 
 ## Built With

@@ -1,0 +1,141 @@
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: "{{ flatliner_app_name }}"
+  labels:
+    app: "{{ flatliner_app_name }}"
+spec:
+  lookupPolicy:
+    local: true
+
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: "{{ flatliner_app_name }}"
+  labels:
+    app: "{{ flatliner_app_name }}"
+spec:
+  resources:
+    limits:
+      memory: 2Gi
+      cpu: "1"
+  output:
+    to:
+      kind: ImageStreamTag
+      name: "{{ flatliner_app_name }}:latest"
+  source:
+    git:
+      uri: "{{ flatliner_git_uri }}"
+      ref: "{{ flatliner_git_ref }}"
+    type: Git
+  strategy:
+    type: Source
+    sourceStrategy:
+      env:
+        - name: GIT_SSL_NO_VERIFY
+          value: 'true'
+        - name: ENABLE_PIPENV
+          value: '1'
+      forcePull: true
+      from:
+        kind: DockerImage
+        name: 'docker.io/centos/python-36-centos7:latest'
+  triggers:
+    - imageChange: {}
+      type: ImageChange
+    - type: ConfigChange
+    - type: "Generic"
+      generic:
+        secretReference:
+          name: generic-webhook-secret
+
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: "{{ flatliner_app_name }}"
+  labels:
+    deploymentConfig: "{{ flatliner_app_name }}"
+    app: "{{ flatliner_app_name }}"
+spec:
+  replicas: 1
+  selector:
+    deploymentConfig: "{{ flatliner_app_name }}"
+  strategy:
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        deploymentConfig: "{{ flatliner_app_name }}"
+        app: "{{ flatliner_app_name }}"
+    spec:
+      containers:
+        - env:
+            - name: FLT_PROM_URL
+              value: "{{ flatliner_prometheus_url }}"
+            - name: FLT_PROM_ACCESS_TOKEN
+              value: "{{ flatliner_prometheus_oauth_token }}"
+            - name: FLT_METRICS_LIST
+              value: "{{ flatliner_metrics_list }}"
+            - name: FLT_METRIC_START_DATETIME
+              value: "{{ flatliner_metrics_start_datetime }}"
+            - name: FLT_METRIC_CHUNK_SIZE
+              value: "{{ flatliner_metrics_chunk_size }}"
+            - name: FLT_LIVE_METRIC_COLLECT
+              value: "{{ flatliner_live_metric_collect }}"
+            - name: FLT_LIVE_METRIC_DELAY
+              value: "{{ flatliner_live_metric_delay }}"
+            - name: FLT_VERSION_FILTER_REGEX
+              value: "{{ flatliner_version_filter_regex }}"
+            - name: FLT_DEBUG_MODE
+              value: "{{ flatliner_debug_mode }}"
+          image: "{{ flatliner_app_name }}"
+          imagePullPolicy: Always
+          name: "prometheus-flatliner"
+          resources:
+            limits:
+              memory: "{{ flatliner_container_memory_limit }}"
+              cpu: "{{ flatliner_container_cpu_limit }}"
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - "prometheus-flatliner"
+        from:
+          kind: ImageStreamTag
+          name: "{{ flatliner_app_name }}:latest"
+      type: ImageChange
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ flatliner_app_name }}"
+  labels:
+    app: "{{ flatliner_app_name }}"
+spec:
+  ports:
+    - port: 8000
+      name: http
+  selector:
+    app: "{{ flatliner_app_name }}"
+
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: "{{ flatliner_app_name }}"
+  labels:
+    app: "{{ flatliner_app_name }}"
+spec:
+  to:
+    kind: Service
+    name: "{{ flatliner_app_name }}"
